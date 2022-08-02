@@ -1,0 +1,11 @@
+name: SakuraBosses
+version: '${project.version}'
+main: io.github.itstaylz.sakurabosses.SakuraBossesPlugin
+api-version: 1.18
+authors: [ itsTaylz ]
+depend: [Hexlib]
+commands:
+
+  bossmenu:
+    permission: sakurabosses.menu
+    permission-message: §cNo permission

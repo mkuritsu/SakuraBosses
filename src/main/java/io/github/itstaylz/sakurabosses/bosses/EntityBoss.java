@@ -4,6 +4,7 @@ import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -37,7 +38,7 @@ public class EntityBoss {
         if (this.mobEntity != null) {
             while (!this.phases.isEmpty() && this.phases.peek().minHealth() > this.mobEntity.getHealth()) {
                 BossPhase phase = this.phases.pop();
-                phase.start(this);
+//                phase.start(this);
             }
         }
     }
@@ -64,7 +65,8 @@ public class EntityBoss {
             BossPhase nextPhase = this.phases.peek();
             if (this.mobEntity.getHealth() <= nextPhase.minHealth()) {
                 this.phases.pop();
-                nextPhase.start(this);
+                if (!this.mobEntity.isDead())
+                    nextPhase.start(this);
             }
         }
     }
@@ -81,6 +83,7 @@ public class EntityBoss {
     public void onDeath() {
         if (RandomUtils.isChanceSuccessful(this.bossData.weapon().dropChance())) {
             this.mobEntity.getWorld().dropItemNaturally(this.mobEntity.getLocation(), this.bossData.weapon().itemStack());
+            BossManager.removeEntityBoss(getUniqueId());
         }
     }
 

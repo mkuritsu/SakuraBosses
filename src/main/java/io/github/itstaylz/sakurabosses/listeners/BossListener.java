@@ -8,9 +8,7 @@ import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
@@ -52,7 +50,7 @@ public class BossListener implements Listener {
     }
 
     @EventHandler
-    private void onChunkLoad(EntitiesLoadEvent event) {
+    private void onEntitiesLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             if (entity instanceof Mob mob) {
                 String bossId = EntityUtils.getPDCValue(entity, BossManager.ENTITY_BOSS_KEY, PersistentDataType.STRING);
@@ -70,6 +68,17 @@ public class BossListener implements Listener {
             event.getDrops().clear();
             event.setDroppedExp(0);
             boss.onDeath();
+        }
+    }
+
+    @EventHandler
+    private void onHit(ProjectileHitEvent event) {
+        if (event.getHitEntity() != null) {
+            EntityBoss boss = BossManager.getEntityBoss(event.getHitEntity().getUniqueId());
+            if (boss != null) {
+                if (event.getEntity().getShooter() != null && event.getEntity().getShooter().equals(event.getHitEntity()))
+                    event.setCancelled(true);
+            }
         }
     }
 

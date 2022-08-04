@@ -3,6 +3,7 @@ package io.github.itstaylz.sakurabosses.bosses.abilities;
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 

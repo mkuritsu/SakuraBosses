@@ -11,15 +11,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class FireballAbility extends TargetAbility<FireballAbility> {
-
-    private static final double SPEED = 1.5;
-
     private final int amount, delay;
+    private double speed;
 
-    FireballAbility(TargetType targetType, int amount, int delay) {
+    FireballAbility(TargetType targetType, int amount, int delay, double speed) {
         super(targetType);
         this.amount = amount;
         this.delay = delay;
+        this.speed = speed;
     }
 
     @Override
@@ -27,7 +26,8 @@ public class FireballAbility extends TargetAbility<FireballAbility> {
         TargetType type = loadTargetType(yaml, path);
         int amount = yaml.getConfig().getInt(path + ".amount");
         int delay = yaml.getConfig().getInt(path + ".delay");
-        return new FireballAbility(type, amount, delay);
+        double speed = yaml.getConfig().getDouble(path + ".speed");
+        return new FireballAbility(type, amount, delay, speed);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class FireballAbility extends TargetAbility<FireballAbility> {
                     return;
                 }
                 Vector direction = target.getLocation().subtract(entityBoss.getMobEntity().getLocation()).toVector().normalize();
-                entityBoss.getMobEntity().launchProjectile(Fireball.class, direction.multiply(SPEED));
+                entityBoss.getMobEntity().launchProjectile(Fireball.class, direction.multiply(speed));
                 counter++;
             }
         }.runTaskTimer(JavaPlugin.getPlugin(SakuraBossesPlugin.class), 0L, this.delay);

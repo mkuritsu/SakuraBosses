@@ -9,3 +9,7 @@ commands:
   bossmenu:
     permission: sakurabosses.menu
     permission-message: §cNo permission
+
+  bossesreload:
+    permission: sakurabosses.reload
+    permission-message: §cNo permission

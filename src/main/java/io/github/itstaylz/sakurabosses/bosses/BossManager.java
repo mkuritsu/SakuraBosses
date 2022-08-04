@@ -31,6 +31,8 @@ public final class BossManager {
     static {
         JavaPlugin plugin = JavaPlugin.getPlugin(SakuraBossesPlugin.class);
         BOSS_FOLDER = new File(plugin.getDataFolder(), "bosses");
+        if (!BOSS_FOLDER.exists())
+            BOSS_FOLDER.mkdirs();
         ENTITY_BOSS_KEY = new NamespacedKey(plugin, "entity_boss");
         BOSS_SPAWN_EGG_KEY = new NamespacedKey(plugin, "boss_spawn_egg");
         BOSS_SPAWNED_ENTITY_KEY = new NamespacedKey(plugin, "boss_spawned");

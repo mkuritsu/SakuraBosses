@@ -36,10 +36,11 @@ public class EntityBoss {
         this.phases.clear();
         this.phases.addAll(this.bossData.phases());
         if (this.mobEntity != null) {
+            this.mobEntity.setHealth(this.bossData.settings().maxHealth());
             while (!this.phases.isEmpty() && this.phases.peek().minHealth() > this.mobEntity.getHealth()) {
-                BossPhase phase = this.phases.pop();
-//                phase.start(this);
+                this.phases.pop();
             }
+            updateHealthBar();
         }
     }
 

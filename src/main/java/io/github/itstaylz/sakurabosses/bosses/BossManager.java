@@ -11,6 +11,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,8 +27,6 @@ public final class BossManager {
 
     public static final NamespacedKey BOSS_SPAWN_EGG_KEY;
 
-    public static final NamespacedKey BOSS_SPAWNED_ENTITY_KEY;
-
     static {
         JavaPlugin plugin = JavaPlugin.getPlugin(SakuraBossesPlugin.class);
         BOSS_FOLDER = new File(plugin.getDataFolder(), "bosses");
@@ -35,7 +34,6 @@ public final class BossManager {
             BOSS_FOLDER.mkdirs();
         ENTITY_BOSS_KEY = new NamespacedKey(plugin, "entity_boss");
         BOSS_SPAWN_EGG_KEY = new NamespacedKey(plugin, "boss_spawn_egg");
-        BOSS_SPAWNED_ENTITY_KEY = new NamespacedKey(plugin, "boss_spawned");
     }
 
     private static final HashMap<String, BossData> BOSS_REGISTRY = new HashMap<>();
@@ -43,6 +41,16 @@ public final class BossManager {
 
     public static List<BossData> getAllBossData() {
         return new ArrayList<>(BOSS_REGISTRY.values());
+    }
+
+    public static void startTargetTask(SakuraBossesPlugin plugin) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (EntityBoss boss : ENTITY_BOSS_REGISTRY.values())
+                    boss.updateTarget();
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
     }
 
     public static void loadBosses() {
@@ -60,14 +68,6 @@ public final class BossManager {
             if (newData != null)
                 entityBoss.reloadData(newData);
         }
-    }
-
-    public static void setBossSpawnedEntity(Entity entity) {
-        EntityUtils.setPDCValue(entity, BOSS_SPAWNED_ENTITY_KEY, PersistentDataType.BYTE, (byte) 1);
-    }
-
-    public static boolean isBossSpawnedEntity(Entity entity) {
-        return EntityUtils.hasPDCValue(entity, BOSS_SPAWNED_ENTITY_KEY, PersistentDataType.BYTE);
     }
 
     public static void loadEntityBoss(Mob entity, String id) {
@@ -100,10 +100,10 @@ public final class BossManager {
         return ENTITY_BOSS_REGISTRY.get(entityUuid);
     }
 
-    public static void removeTarget(Player player) {
+    public static void untarget(Player player) {
         for (EntityBoss boss : ENTITY_BOSS_REGISTRY.values()) {
             if (boss.getMobEntity() != null && boss.getMobEntity().getTarget() != null && boss.getMobEntity().getTarget().equals(player)) {
-                boss.getMobEntity().setTarget(null);
+                boss.updateTarget();
             }
         }
     }

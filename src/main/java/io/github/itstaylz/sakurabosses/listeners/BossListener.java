@@ -1,36 +1,27 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
-import com.earth2me.essentials.Essentials;
 import io.github.itstaylz.hexlib.utils.EntityUtils;
-import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
-import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
+import io.github.itstaylz.sakurabosses.events.BossDamagePlayerEvent;
+import io.github.itstaylz.sakurabosses.events.PlayerDamageBossEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BossListener implements Listener {
 
     private final JavaPlugin plugin;
-    private final Essentials essentials;
 
     public BossListener(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
     }
 
     @EventHandler
@@ -73,43 +64,39 @@ public class BossListener implements Listener {
 
     @EventHandler
     private void onHit(ProjectileHitEvent event) {
-        if (event.getHitEntity() != null) {
+        if (event.getHitEntity() != null && event.getEntityType() != EntityType.ARROW) {
             EntityBoss boss = BossManager.getEntityBoss(event.getHitEntity().getUniqueId());
             if (boss != null) {
-                if (event.getEntity().getShooter() != null && event.getEntity().getShooter().equals(event.getHitEntity()))
+                if (event.getEntity().getShooter() != null && event.getEntity().getShooter() == event.getHitEntity())
                     event.setCancelled(true);
             }
         }
     }
 
     @EventHandler
-    private void onTarget(EntityTargetLivingEntityEvent event) {
-        Bukkit.broadcastMessage("TARGET");
-        Entity entity = event.getEntity();
-        EntityBoss boss = BossManager.getEntityBoss(entity.getUniqueId());
-        if (boss != null) {
-            TargetType type = boss.getBossData().settings().targetType();
-            List<Player> players = boss.getPlayersInRadius();
-            Player target = null;
-            if (type == TargetType.RANDOM) {
-                int index = RandomUtils.RANDOM.nextInt(0, players.size());
-                target = players.get(index);
-            } else {
-                for (Player player : players) {
-                    if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR ||
-                            this.essentials.getUser(player).isVanished() || player.isDead())
-                        continue;
-                    if (target == null)
-                        target = player;
-                    if ((type == TargetType.CLOSEST &&
-                            player.getLocation().distance(entity.getLocation()) < target.getLocation().distance(entity.getLocation())) ||
-                            (type == TargetType.HIGHEST_HEALTH && player.getHealth() > target.getHealth()) ||
-                            (type == TargetType.LOWEST_HEALTH && player.getHealth() < target.getHealth())) {
-                        target = player;
-                    }
-                }
+    private void onDamage(EntityDamageByEntityEvent event) {
+        Entity victim = event.getEntity();
+        Entity damager = event.getDamager();
+        EntityBoss victimBoss = BossManager.getEntityBoss(victim.getUniqueId());
+        EntityBoss damagerBoss = BossManager.getEntityBoss(damager.getUniqueId());
+        if (victimBoss != null && damager instanceof Arrow arrow) {
+            if (arrow.getShooter() != null && arrow.getShooter().equals(victim)) {
+                event.setCancelled(true);
             }
-            event.setTarget(target);
         }
+        if (damagerBoss != null && event.getEntity() instanceof Player player)
+            Bukkit.getPluginManager().callEvent(new BossDamagePlayerEvent(event, player, damagerBoss));
+        else if (victimBoss != null && damager instanceof Player player)
+            Bukkit.getPluginManager().callEvent(new PlayerDamageBossEvent(event, player, victimBoss));
+    }
+
+    @EventHandler
+    private void onBossDamage(BossDamagePlayerEvent event) {
+        event.getEntityBoss().triggerEffects(event);
+    }
+
+    @EventHandler
+    private void onPlayerDamage(PlayerDamageBossEvent event) {
+        event.getEntityBoss().triggerEffects(event);
     }
 }

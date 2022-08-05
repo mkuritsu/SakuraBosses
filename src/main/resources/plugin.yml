@@ -3,7 +3,8 @@ version: '${project.version}'
 main: io.github.itstaylz.sakurabosses.SakuraBossesPlugin
 api-version: 1.18
 authors: [ itsTaylz ]
-depend: [Hexlib]
+depend: [Hexlib, Essentials]
+load: STARTUP
 commands:
 
   bossmenu:

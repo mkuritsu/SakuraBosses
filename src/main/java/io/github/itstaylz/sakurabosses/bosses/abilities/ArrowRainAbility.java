@@ -11,15 +11,14 @@ import org.bukkit.entity.Projectile;
 public class ArrowRainAbility extends TargetAbility<ArrowRainAbility> {
 
     private static final double RADIUS_PRECISION = 0.5;
-    private static final int ANGLE_PRECISION_INCREMENTS = 5;
-    private static final int STARTING_ANGLE_PRECISION = 5;
 
-    private final double radius, height;
+    private final double radius, height, density;
 
-    ArrowRainAbility(TargetType targetType, double radius, double height) {
+    ArrowRainAbility(TargetType targetType, double radius, double height, double density) {
         super(targetType);
         this.radius = radius;
         this.height = height;
+        this.density = density;
     }
 
     @Override
@@ -27,15 +26,16 @@ public class ArrowRainAbility extends TargetAbility<ArrowRainAbility> {
         TargetType targetType = loadTargetType(yaml, path);
         double radius = yaml.getConfig().getDouble(path + ".radius");
         double height = yaml.getConfig().getDouble(path + ".height");
-        return new ArrowRainAbility(targetType, radius, height);
+        double density = yaml.getConfig().getDouble(path + ".density");
+        return new ArrowRainAbility(targetType, radius, height, density);
     }
 
     @Override
     public void activate(EntityBoss entityBoss, LivingEntity target) {
-        double anglePrecision = STARTING_ANGLE_PRECISION;
+        double angleIncrements = 360 / density;
         for (double radius = this.radius; radius > 0; radius -= RADIUS_PRECISION)
         {
-            for (int angle = 0; angle < 360; angle += anglePrecision)
+            for (int angle = 0; angle < 360; angle += angleIncrements)
             {
                 double x = Math.cos(Math.toRadians(angle)) * radius;
                 double z = Math.sin(Math.toRadians(angle)) * radius;
@@ -43,7 +43,6 @@ public class ArrowRainAbility extends TargetAbility<ArrowRainAbility> {
                 Projectile projectile = (Projectile) target.getWorld().spawnEntity(loc, EntityType.ARROW);
                 projectile.setShooter(entityBoss.getMobEntity());
             }
-            anglePrecision += ANGLE_PRECISION_INCREMENTS;
         }
         target.getWorld().spawnEntity(target.getLocation().add(0, this.height, 0), EntityType.ARROW);
     }

@@ -35,13 +35,13 @@ public class PlayerListener implements Listener {
     private void onGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         if (event.getNewGameMode() == GameMode.CREATIVE || event.getNewGameMode() == GameMode.SPECTATOR) {
-            BossManager.removeTarget(player);
+            BossManager.untarget(player);
         }
     }
 
     @EventHandler
     private void onVanish(VanishStatusChangeEvent event) {
         Player player = event.getAffected().getBase();
-        BossManager.removeTarget(player);
+        BossManager.untarget(player);
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class Abilities {
 
-    public static final IBossAbility<ArrowRainAbility> ARROW_RAIN = new ArrowRainAbility(TargetType.CLOSEST, 0, 0);
+    public static final IBossAbility<ArrowRainAbility> ARROW_RAIN = new ArrowRainAbility(TargetType.CLOSEST, 0, 0, 0);
 
     public static final IBossAbility<ThrowAbility> THROW_ABILITY = new ThrowAbility(TargetType.CLOSEST, new Vector(0, 0, 0));
 
@@ -26,9 +26,21 @@ public final class Abilities {
 
     public static final IBossAbility<PotionAbility> POTION_ABILITY = new PotionAbility(TargetType.CLOSEST, PotionType.AWKWARD, 0 ,0);
 
-    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW_ABILITY = new PursuingArrowAbility(TargetType.CLOSEST, 0, 0);
+    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW_ABILITY = new PursuingArrowAbility(TargetType.CLOSEST, 0, 0, 0, null);
 
     public static final IBossAbility<WebAbility> WEB_ABILITY = new WebAbility(TargetType.CLOSEST, 0, 0, 0, 0);
+
+    public static final IBossAbility<LifeStealAbility> LIFESTEAL = new LifeStealAbility(0, 0);
+
+    public static final IBossAbility<KnockbackAbility> KNOCKBACK = new KnockbackAbility(TargetType.CLOSEST, 0, 0, 0);
+
+    public static final IBossAbility<SmiteAbility> SMITE = new SmiteAbility(TargetType.CLOSEST, 0);
+
+    public static final IBossAbility<ImmunityAbility> IMMUNITY = new ImmunityAbility(null, 0);
+
+    public static final IBossAbility<TeleportAbility> TELEPORT = new TeleportAbility(TargetType.CLOSEST);
+
+    public static final IBossAbility<DurabilityAbility> DURABILITY = new DurabilityAbility(0, 0);
 
     private static final HashMap<String, IBossAbility<?>> ABILITY_REGISTRY = new HashMap<>();
 
@@ -42,6 +54,12 @@ public final class Abilities {
         ABILITY_REGISTRY.put("potion", POTION_ABILITY);
         ABILITY_REGISTRY.put("pursuing_arrow", PURSUING_ARROW_ABILITY);
         ABILITY_REGISTRY.put("web", WEB_ABILITY);
+        ABILITY_REGISTRY.put("lifesteal", LIFESTEAL);
+        ABILITY_REGISTRY.put("knockback", KNOCKBACK);
+        ABILITY_REGISTRY.put("smite", SMITE);
+        ABILITY_REGISTRY.put("immunity", IMMUNITY);
+        ABILITY_REGISTRY.put("teleport", TELEPORT);
+        ABILITY_REGISTRY.put("durability", DURABILITY);
     }
 
     public static List<IBossAbility<?>> loadBossAbilities(YamlFile yaml, String path) {

@@ -6,7 +6,7 @@ import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 
-public class CommandAbility extends TargetAbility<CommandAbility> {
+public class CommandAbility extends ATargetAbility<CommandAbility> {
 
     private final String command;
 

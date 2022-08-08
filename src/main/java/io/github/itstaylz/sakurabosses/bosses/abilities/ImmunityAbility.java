@@ -8,28 +8,31 @@ import java.util.List;
 
 public class ImmunityAbility implements IBossAbility<ImmunityAbility> {
 
-    private final List<String> ignoreList;
+    private final List<String> ignoredWeapons;
+    private final List<String> ignoredProjectiles;
     private final int duration;
 
     ImmunityAbility() {
-        this(null, 0);
+        this(null, null, 0);
     }
 
-    ImmunityAbility(List<String> materials, int duration) {
-        this.ignoreList = materials;
+    ImmunityAbility(List<String> ignoredWeapons, List<String> ignoredProjectiles, int duration) {
+        this.ignoredWeapons = ignoredWeapons;
+        this.ignoredProjectiles = ignoredProjectiles;
         this.duration = duration;
     }
 
     @Override
     public ImmunityAbility create(YamlFile yaml, String path) {
-        List<String> materials = yaml.getConfig().getStringList(path + ".materials");
+        List<String> weapons = yaml.getConfig().getStringList(path + ".weapons");
+        List<String> projectiles = yaml.getConfig().getStringList(path + ".projectiles");
         int duration = yaml.getConfig().getInt(path + ".duration");
-        return new ImmunityAbility(materials, duration);
+        return new ImmunityAbility(weapons, projectiles, duration);
     }
 
     @Override
     public void activate(EntityBoss entityBoss) {
-        entityBoss.activateEffect(new ImmunityEffect(ignoreList), this.duration);
+        entityBoss.activateEffect(new ImmunityEffect(ignoredWeapons, ignoredProjectiles), this.duration);
     }
 
 }

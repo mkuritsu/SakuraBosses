@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public abstract class TargetAbility<T extends IBossAbility<T>> implements IBossAbility<T> {
+public abstract class ATargetAbility<T extends IBossAbility<T>> implements IBossAbility<T> {
 
     private final TargetType targetType;
 
-    TargetAbility(TargetType targetType) {
+    ATargetAbility(TargetType targetType) {
         this.targetType = targetType;
     }
 

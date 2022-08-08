@@ -4,7 +4,6 @@ import io.github.itstaylz.hexlib.storage.files.YamlFile;
 import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
-import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.entity.EntityType;
@@ -15,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class FireballAbility extends TargetAbility<FireballAbility> {
+public class FireballAbility extends ATargetAbility<FireballAbility> {
     private final int amount, delay;
     private final double damage;
 

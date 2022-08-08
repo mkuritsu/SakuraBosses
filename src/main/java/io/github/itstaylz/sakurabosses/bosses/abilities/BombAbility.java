@@ -3,7 +3,6 @@ package io.github.itstaylz.sakurabosses.bosses.abilities;
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
 import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
-import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.entity.Entity;
@@ -11,7 +10,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataType;
 
-public class BombAbility extends TargetAbility<BombAbility> {
+public class BombAbility extends ATargetAbility<BombAbility> {
 
     private final double height, damage;
     private final int amount;

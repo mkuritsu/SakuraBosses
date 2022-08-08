@@ -1,7 +1,6 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
@@ -13,10 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class PursuingArrowAbility extends TargetAbility<PursuingArrowAbility> {
+public class PursuingArrowAbility extends ATargetAbility<PursuingArrowAbility> {
 
     private final double damage, speed;
     private final Particle particle;

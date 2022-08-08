@@ -6,7 +6,7 @@ import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
-public class ThrowAbility extends TargetAbility<ThrowAbility> {
+public class ThrowAbility extends ATargetAbility<ThrowAbility> {
 
     private enum ThrowType {
         DEFAULT,

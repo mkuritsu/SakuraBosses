@@ -6,13 +6,10 @@ import io.github.itstaylz.hexlib.utils.ItemUtils;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
-import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.BossPhase;
 import io.github.itstaylz.sakurabosses.bosses.abilities.Abilities;
 import io.github.itstaylz.sakurabosses.bosses.abilities.IBossAbility;
 import io.github.itstaylz.sakurabosses.utils.YamlUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -47,7 +44,6 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
                 new ItemBuilder(spawnEgg).addEnchant(Enchantment.DURABILITY, 1).addItemFlags(ItemFlag.HIDE_ENCHANTS).build();
             ItemUtils.setPDCValue(spawnEgg, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
 
-
             // Load equipment
             BossEquipmentItem weapon = YamlUtils.loadBossEquipment(yaml, "equipment.weapon");
             BossEquipmentItem helmet = YamlUtils.loadBossEquipment(yaml, "equipment.helmet");
@@ -55,7 +51,6 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             BossEquipmentItem leggings = YamlUtils.loadBossEquipment(yaml, "equipment.leggings");
             BossEquipmentItem boots = YamlUtils.loadBossEquipment(yaml, "equipment.boots");
             BossEquipmentItem[] equipment = new BossEquipmentItem[] { weapon, helmet, chestplate, leggings, boots };
-
 
             // Load phases
             PriorityQueue<BossPhase> phases = new PriorityQueue<>();

@@ -1,10 +1,7 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.potion.PotionType;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -7,7 +7,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
-public class ExplosionAbility extends TargetAbility<ExplosionAbility> {
+public class ExplosionAbility extends ATargetAbility<ExplosionAbility> {
 
     private final double damage;
 

@@ -8,7 +8,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-public class ArrowRainAbility extends TargetAbility<ArrowRainAbility> {
+public class ArrowRainAbility extends ATargetAbility<ArrowRainAbility> {
 
     private final double radius, height, precision;
 

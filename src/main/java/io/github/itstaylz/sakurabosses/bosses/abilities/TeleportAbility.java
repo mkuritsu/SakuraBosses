@@ -6,7 +6,7 @@ import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
-public class TeleportAbility extends TargetAbility<TeleportAbility> {
+public class TeleportAbility extends ATargetAbility<TeleportAbility> {
 
     TeleportAbility() {
         this(TargetType.CLOSEST);

@@ -6,7 +6,7 @@ import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
-public class SmiteAbility extends TargetAbility<SmiteAbility> {
+public class SmiteAbility extends ATargetAbility<SmiteAbility> {
 
     private final double damage;
 

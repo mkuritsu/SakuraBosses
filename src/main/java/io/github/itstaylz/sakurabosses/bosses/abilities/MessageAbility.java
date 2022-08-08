@@ -6,7 +6,7 @@ import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.entity.LivingEntity;
 
-public class MessageAbility extends TargetAbility<MessageAbility> {
+public class MessageAbility extends ATargetAbility<MessageAbility> {
 
     private final String message;
 

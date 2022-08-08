@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
-public class PotionAbility extends TargetAbility<PotionAbility> {
+public class PotionAbility extends ATargetAbility<PotionAbility> {
 
     private final PotionType type;
     private final int duration, amplifier;

@@ -4,10 +4,7 @@ import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
-import io.github.itstaylz.sakurabosses.events.BossDamagePlayerEvent;
-import io.github.itstaylz.sakurabosses.events.PlayerDamageBossEvent;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -95,30 +92,11 @@ public class BossListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onDamage(EntityDamageByEntityEvent event) {
         Entity victim = event.getEntity();
-        Entity damager = event.getDamager();
-        EntityBoss victimBoss = BossManager.getEntityBoss(victim.getUniqueId());
-        EntityBoss damagerBoss = BossManager.getEntityBoss(damager.getUniqueId());
-        if (victimBoss != null) {
-            if (BossManager.isMinion(damager))
-                event.setCancelled(true);
-            else if (damager instanceof Player player)
-                Bukkit.getPluginManager().callEvent(new PlayerDamageBossEvent(event, player, victimBoss));
-        } else if (damagerBoss != null && event.getEntity() instanceof Player player)
-            Bukkit.getPluginManager().callEvent(new BossDamagePlayerEvent(event, player, damagerBoss));
+        Entity attacker = event.getDamager();
+        if (BossManager.isBoss(victim) && BossManager.isBoss(attacker))
+            event.setCancelled(true);
     }
 
-
-    // Custom events to trigger effects
-    //-------------------------------------------------------------------------------------------------------
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onBossDamage(BossDamagePlayerEvent event) {
-        event.getEntityBoss().triggerEffects(event);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onPlayerDamage(PlayerDamageBossEvent event) {
-        event.getEntityBoss().triggerEffects(event);
-    }
 
     // Disable entity functionality for boss and minions
     //-------------------------------------------------------------------------------------------------------

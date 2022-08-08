@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
-public class ParticleAbility extends TargetAbility<ParticleAbility> {
+public class ParticleAbility extends ATargetAbility<ParticleAbility> {
 
     private enum ParticleShape {
         DEFAULT,

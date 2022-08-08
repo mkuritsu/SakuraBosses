@@ -2,7 +2,6 @@ package io.github.itstaylz.sakurabosses.bosses;
 
 import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.hexlib.utils.RandomUtils;
-import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
 import io.github.itstaylz.sakurabosses.bosses.data.BossEquipmentItem;
@@ -11,17 +10,12 @@ import io.github.itstaylz.sakurabosses.bosses.effects.IBossEffect;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
 import io.github.itstaylz.sakurabosses.utils.MobEntityUtils;
 import io.github.itstaylz.sakurabosses.utils.TargetUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,7 +29,7 @@ public class EntityBoss {
 
     private final Queue<BossPhase> phases = new ArrayDeque<>();
 
-    private final List<IBossEffect<?>> activeEffects = new ArrayList<>();
+    private final HashMap<Class<? extends IBossEffect>, IBossEffect> activeEffects = new HashMap<>();
 
     public EntityBoss(BossData bossData) {
         this(bossData, null);
@@ -46,27 +40,28 @@ public class EntityBoss {
         reloadData(bossData);
     }
 
-    public void activateEffect(IBossEffect<?> effect, int duration) {
-        activeEffects.add(effect);
+    public void activateEffect(IBossEffect effect, int duration) {
+        activeEffects.put(effect.getClass(), effect);
         if (duration > 0) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    deactivateEffect(effect);
+                    IBossEffect storedEffect = activeEffects.get(effect.getClass());
+                    if (storedEffect == effect)
+                        activeEffects.remove(effect.getClass());
                 }
             }.runTaskLater(JavaPlugin.getProvidingPlugin(SakuraBossesPlugin.class), duration);
         }
     }
 
-    public void deactivateEffect(IBossEffect<?> effect) {
-        activeEffects.remove(effect);
+    public <T extends IBossEffect> boolean hasEffect(Class<T> clazz) {
+        return activeEffects.containsKey(clazz);
     }
 
-    public <TEvent extends Event> void triggerEffects(TEvent event) {
-        for (IBossEffect<?> effect : activeEffects) {
-            if (event.getClass().equals(effect.getEventClass()))
-                ((IBossEffect<TEvent>) effect).activate(this, event);
-        }
+    public <T extends IBossEffect> T getActiveEffect(Class<T> clazz) {
+        if (hasEffect(clazz))
+            return (T) activeEffects.get(clazz);
+        return null;
     }
 
     public void reloadData(BossData data) {

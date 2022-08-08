@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebAbility extends TargetAbility<WebAbility> {
+public class WebAbility extends ATargetAbility<WebAbility> {
 
     private final int width, height, duration;
 

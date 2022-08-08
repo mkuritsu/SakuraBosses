@@ -8,6 +8,7 @@ import io.github.itstaylz.sakurabosses.commands.BossReloadCommand;
 import io.github.itstaylz.sakurabosses.commands.SpawnBossCommand;
 import io.github.itstaylz.sakurabosses.listeners.AbilityListener;
 import io.github.itstaylz.sakurabosses.listeners.BossListener;
+import io.github.itstaylz.sakurabosses.listeners.EffectListener;
 import io.github.itstaylz.sakurabosses.listeners.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -28,6 +29,7 @@ public final class SakuraBossesPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         Bukkit.getPluginManager().registerEvents(new BossListener(this), this);
         Bukkit.getPluginManager().registerEvents(new AbilityListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EffectListener(), this);
         getCommand("bossmenu").setExecutor(new BossMenuCommand());
         getCommand("bossesreload").setExecutor(new BossReloadCommand());
         SpawnBossCommand spawnBossCommand = new SpawnBossCommand();

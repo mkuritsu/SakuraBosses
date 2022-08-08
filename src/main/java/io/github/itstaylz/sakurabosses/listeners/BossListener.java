@@ -1,15 +1,13 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
 import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.events.BossDamagePlayerEvent;
 import io.github.itstaylz.sakurabosses.events.PlayerDamageBossEvent;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,7 +34,7 @@ public class BossListener implements Listener {
     private void onEntitiesLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             if (entity instanceof Mob mob) {
-                String bossId = EntityUtils.getPDCValue(entity, BossManager.ENTITY_BOSS_KEY, PersistentDataType.STRING);
+                String bossId = EntityUtils.getPDCValue(entity, BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING);
                 if (bossId != null) {
                     BossManager.loadEntityBoss(mob, bossId);
                 }
@@ -65,21 +63,6 @@ public class BossListener implements Listener {
         }
     }
 
-
-    // Disable block explosion for minions
-    //-------------------------------------------------------------------------------------------------------
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onExplode(EntityExplodeEvent event) {
-        Entity entity = event.getEntity();
-        if (BossManager.isMinion(entity)) {
-            event.setCancelled(true);
-            entity.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1);
-            entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-        }
-    }
-
-
     // Disable projectile  hitting boss
     //-------------------------------------------------------------------------------------------------------
 
@@ -106,23 +89,6 @@ public class BossListener implements Listener {
         if (boss != null)
             boss.onDeath();
     }
-
-    // Apply minions explosion damage (used for BombAbility and FireballAbility to work properly)
-    @EventHandler
-    private void onDamageByEntity(EntityDamageByEntityEvent event) {
-        Entity victim = event.getEntity();
-        Entity damager = event.getDamager();
-        if (victim instanceof Player) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && BossManager.isMinion(damager)) {
-                Double minionDamage = EntityUtils.getPDCValue(damager, BossManager.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE);
-                double damage = 0;
-                if (minionDamage != null)
-                    damage = minionDamage;
-                event.setDamage(damage);
-            }
-        }
-    }
-
 
     // Call custom events and disable minion damaging boss
     //-------------------------------------------------------------------------------------------------------

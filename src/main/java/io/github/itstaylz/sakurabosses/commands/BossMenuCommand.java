@@ -12,11 +12,10 @@ public class BossMenuCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("bossmenu")) {
-            if (sender instanceof Player player) {
+            if (sender instanceof Player player)
                 new BossMenu().open(player);
-            } else {
+            else
                 sender.sendMessage(StringUtils.colorize("&cOnly players can execute this command!"));
-            }
             return true;
         }
         return false;

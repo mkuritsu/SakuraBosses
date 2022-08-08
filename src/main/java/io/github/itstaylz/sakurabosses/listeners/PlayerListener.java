@@ -1,7 +1,9 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
 import io.github.itstaylz.hexlib.utils.ItemUtils;
+import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
+import io.github.itstaylz.sakurabosses.bosses.BossTargeting;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -25,9 +27,9 @@ public class PlayerListener implements Listener {
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
         if (item != null && block != null && item.getType().name().contains("SPAWN_EGG") && event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                ItemUtils.hasPDCValue(item, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING)) {
+                ItemUtils.hasPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING)) {
             event.setCancelled(true);
-            String bossId = ItemUtils.getPDCValue(item, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING);
+            String bossId = ItemUtils.getPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING);
             Location spawnLocation = block.getLocation().add(event.getBlockFace().getDirection());
             BossManager.spawnBoss(bossId, spawnLocation);
             if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
@@ -37,15 +39,13 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     private void onGameModeChange(PlayerGameModeChangeEvent event) {
-        Player player = event.getPlayer();
         if (event.getNewGameMode() == GameMode.CREATIVE || event.getNewGameMode() == GameMode.SPECTATOR) {
-            BossManager.untarget(player);
+            BossTargeting.removeTarget(event.getPlayer());
         }
     }
 
     @EventHandler
     private void onVanish(VanishStatusChangeEvent event) {
-        Player player = event.getAffected().getBase();
-        BossManager.untarget(player);
+        BossTargeting.removeTarget(event.getAffected().getBase());
     }
 }

@@ -63,5 +63,9 @@ public abstract class TargetAbility<T extends IBossAbility<T>> implements IBossA
         }
     }
 
+    protected TargetType getTargetType() {
+        return targetType;
+    }
+
     public abstract void activate(EntityBoss entityBoss, LivingEntity target);
 }

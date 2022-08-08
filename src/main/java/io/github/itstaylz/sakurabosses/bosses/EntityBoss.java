@@ -126,7 +126,7 @@ public class EntityBoss {
 
     public Entity spawnMinion(Location location, EntityType type) {
         Entity entity = location.getWorld().spawnEntity(location, type);
-        EntityUtils.setPDCValue(entity, BossManager.BOSS_MINION_KEY, PersistentDataType.STRING, this.mobEntity.getUniqueId().toString());
+        EntityUtils.setPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING, this.mobEntity.getUniqueId().toString());
         return entity;
     }
 

@@ -14,21 +14,21 @@ public final class Abilities {
 
     public static final IBossAbility<ArrowRainAbility> ARROW_RAIN = new ArrowRainAbility();
 
-    public static final IBossAbility<ThrowAbility> THROW_ABILITY = new ThrowAbility();
+    public static final IBossAbility<ThrowAbility> THROW = new ThrowAbility();
 
-    public static final IBossAbility<MessageAbility> MESSAGE_ABILITY = new MessageAbility();
+    public static final IBossAbility<MessageAbility> MESSAGE = new MessageAbility();
 
-    public static final IBossAbility<FireballAbility> FIREBALL_ABILITY = new FireballAbility();
+    public static final IBossAbility<FireballAbility> FIREBALL = new FireballAbility();
 
-    public static final IBossAbility<ExplosionAbility> EXPLOSION_ABILITY = new ExplosionAbility();
+    public static final IBossAbility<ExplosionAbility> EXPLOSION = new ExplosionAbility();
 
-    public static final IBossAbility<CommandAbility> COMMAND_ABILITY = new CommandAbility();
+    public static final IBossAbility<CommandAbility> COMMAND = new CommandAbility();
 
-    public static final IBossAbility<PotionAbility> POTION_ABILITY = new PotionAbility();
+    public static final IBossAbility<PotionAbility> POTION = new PotionAbility();
 
-    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW_ABILITY = new PursuingArrowAbility();
+    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW = new PursuingArrowAbility();
 
-    public static final IBossAbility<WebAbility> WEB_ABILITY = new WebAbility();
+    public static final IBossAbility<WebAbility> WEB = new WebAbility();
 
     public static final IBossAbility<LifeStealAbility> LIFESTEAL = new LifeStealAbility();
 
@@ -54,14 +54,14 @@ public final class Abilities {
 
     static {
         ABILITY_REGISTRY.put("arrow_rain", ARROW_RAIN);
-        ABILITY_REGISTRY.put("throw", THROW_ABILITY);
-        ABILITY_REGISTRY.put("message", MESSAGE_ABILITY);
-        ABILITY_REGISTRY.put("fireball", FIREBALL_ABILITY);
-        ABILITY_REGISTRY.put("explosion", EXPLOSION_ABILITY);
-        ABILITY_REGISTRY.put("command", COMMAND_ABILITY);
-        ABILITY_REGISTRY.put("potion", POTION_ABILITY);
-        ABILITY_REGISTRY.put("pursuing_arrow", PURSUING_ARROW_ABILITY);
-        ABILITY_REGISTRY.put("web", WEB_ABILITY);
+        ABILITY_REGISTRY.put("throw", THROW);
+        ABILITY_REGISTRY.put("message", MESSAGE);
+        ABILITY_REGISTRY.put("fireball", FIREBALL);
+        ABILITY_REGISTRY.put("explosion", EXPLOSION);
+        ABILITY_REGISTRY.put("command", COMMAND);
+        ABILITY_REGISTRY.put("potion", POTION);
+        ABILITY_REGISTRY.put("pursuing_arrow", PURSUING_ARROW);
+        ABILITY_REGISTRY.put("web", WEB);
         ABILITY_REGISTRY.put("lifesteal", LIFESTEAL);
         ABILITY_REGISTRY.put("smite", SMITE);
         ABILITY_REGISTRY.put("immunity", IMMUNITY);

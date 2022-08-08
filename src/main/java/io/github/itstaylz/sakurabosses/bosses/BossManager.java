@@ -19,24 +19,12 @@ public final class BossManager {
 
     private static final File BOSS_FOLDER;
 
-    public static final NamespacedKey ENTITY_BOSS_KEY;
-
-    public static final NamespacedKey BOSS_SPAWN_EGG_KEY;
-
-    public static final NamespacedKey BOSS_MINION_KEY;
-
-    public static final NamespacedKey MINION_DAMAGE_KEY;
-
 
     static {
         JavaPlugin plugin = JavaPlugin.getPlugin(SakuraBossesPlugin.class);
         BOSS_FOLDER = new File(plugin.getDataFolder(), "bosses");
         if (!BOSS_FOLDER.exists())
             BOSS_FOLDER.mkdirs();
-        ENTITY_BOSS_KEY = new NamespacedKey(plugin, "entity_boss");
-        BOSS_SPAWN_EGG_KEY = new NamespacedKey(plugin, "boss_spawn_egg");
-        BOSS_MINION_KEY = new NamespacedKey(plugin, "boss_minion");
-        MINION_DAMAGE_KEY = new NamespacedKey(plugin, "boss_minion_damage");
     }
 
     private static final HashMap<String, BossData> BOSS_REGISTRY = new HashMap<>();
@@ -46,27 +34,14 @@ public final class BossManager {
         return new ArrayList<>(BOSS_REGISTRY.values());
     }
 
-    public static void startTargetTask(SakuraBossesPlugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (EntityBoss boss : ENTITY_BOSS_REGISTRY.values())
-                    boss.updateTarget();
-            }
-        }.runTaskTimer(plugin, 0L, 20L);
-    }
-
-    public static boolean isMinion(Entity entity) {
-        return EntityUtils.hasPDCValue(entity, BOSS_MINION_KEY, PersistentDataType.STRING);
-    }
-
-    public static EntityBoss getOwnedBoss(Entity entity) {
-        UUID uuid = UUID.fromString(EntityUtils.getPDCValue(entity, BOSS_MINION_KEY, PersistentDataType.STRING));
-        return ENTITY_BOSS_REGISTRY.get(uuid);
-    }
-
-    public static Set<String> getAllIds() {
-        return BOSS_REGISTRY.keySet();
+    public static void spawnBoss(String id, Location location) {
+        BossData data = getBossData(id);
+        if (data == null)
+            throw new RuntimeException("No boss with the id '" + id + "'");
+        EntityBoss entityBoss = new EntityBoss(data);
+        entityBoss.spawn(location);
+        ENTITY_BOSS_REGISTRY.put(entityBoss.getUniqueId(), entityBoss);
+        EntityUtils.setPDCValue(entityBoss.getMobEntity(), BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING, entityBoss.getBossData().id());
     }
 
     public static void loadBosses() {
@@ -94,14 +69,13 @@ public final class BossManager {
         ENTITY_BOSS_REGISTRY.put(entity.getUniqueId(), entityBoss);
     }
 
-    public static void spawnBoss(String id, Location location) {
-        BossData data = getBossData(id);
-        if (data == null)
-            throw new RuntimeException("No boss with the id '" + id + "'");
-        EntityBoss entityBoss = new EntityBoss(data);
-        entityBoss.spawn(location);
-        ENTITY_BOSS_REGISTRY.put(entityBoss.getUniqueId(), entityBoss);
-        EntityUtils.setPDCValue(entityBoss.getMobEntity(), BossManager.ENTITY_BOSS_KEY, PersistentDataType.STRING, entityBoss.getBossData().id());
+    public static boolean isMinion(Entity entity) {
+        return EntityUtils.hasPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING);
+    }
+
+    public static EntityBoss getOwnedBoss(Entity entity) {
+        UUID uuid = UUID.fromString(EntityUtils.getPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING));
+        return ENTITY_BOSS_REGISTRY.get(uuid);
     }
 
     public static boolean isBoss(Entity entity) {
@@ -116,12 +90,12 @@ public final class BossManager {
         return ENTITY_BOSS_REGISTRY.get(entityUuid);
     }
 
-    public static void untarget(Player player) {
-        for (EntityBoss boss : ENTITY_BOSS_REGISTRY.values()) {
-            if (boss.getMobEntity() != null && boss.getMobEntity().getTarget() != null && boss.getMobEntity().getTarget().equals(player)) {
-                boss.updateTarget();
-            }
-        }
+    public static Set<String> getAllIds() {
+        return BOSS_REGISTRY.keySet();
+    }
+
+    public static Collection<EntityBoss> getAllActiveBossEntities() {
+        return ENTITY_BOSS_REGISTRY.values();
     }
 
     public static void removeEntityBoss(UUID uuid) {

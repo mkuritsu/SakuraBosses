@@ -8,7 +8,7 @@ import org.bukkit.inventory.meta.Damageable;
 
 public class DurabilityEffect implements IBossEffect<BossDamagePlayerEvent> {
 
-    private int damageAmount;
+    private final int damageAmount;
 
     public DurabilityEffect(int damageAmount) {
         this.damageAmount = damageAmount;

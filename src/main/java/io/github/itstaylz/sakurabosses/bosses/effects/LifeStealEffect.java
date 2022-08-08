@@ -5,7 +5,7 @@ import io.github.itstaylz.sakurabosses.events.BossDamagePlayerEvent;
 
 public class LifeStealEffect implements IBossEffect<BossDamagePlayerEvent> {
 
-    private double multiplier;
+    private final double multiplier;
 
     public LifeStealEffect(double multiplier) {
         this.multiplier = multiplier;

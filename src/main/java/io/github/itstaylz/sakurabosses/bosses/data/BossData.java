@@ -4,6 +4,8 @@ import io.github.itstaylz.hexlib.items.ItemBuilder;
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
 import io.github.itstaylz.hexlib.utils.ItemUtils;
 import io.github.itstaylz.hexlib.utils.StringUtils;
+import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
+import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.BossPhase;
 import io.github.itstaylz.sakurabosses.bosses.abilities.Abilities;
@@ -29,7 +31,7 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
         try {
             String id = file.getName().replace(".yml", "");
 
-            // Load settings
+            // Load general boss settings
             String displayName = StringUtils.fullColorize(yaml.getOrDefault("settings.display_name", "&4&lBOSS"));
             EntityType entityType = EntityType.valueOf(yaml.getOrDefault("settings.entity_type", "ZOMBIE"));
             double maxHealth = yaml.contains("settings.max_health") ? yaml.getConfig().getDouble("settings.max_health") : 10000;
@@ -38,12 +40,12 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             double radius = yaml.getConfig().getDouble("settings.radius");
             BossSettings settings = new BossSettings(displayName, entityType, maxHealth, targetType, knockBack, radius);
 
-            // Load spawn egg settings
+            // Load spawn egg
             ItemStack spawnEgg = YamlUtils.loadItemStack(yaml, "spawn_egg");
             boolean glowing = yaml.getConfig().getBoolean("spawn_egg.glowing");
             if (glowing)
                 new ItemBuilder(spawnEgg).addEnchant(Enchantment.DURABILITY, 1).addItemFlags(ItemFlag.HIDE_ENCHANTS).build();
-            ItemUtils.setPDCValue(spawnEgg, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
+            ItemUtils.setPDCValue(spawnEgg, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
 
 
             // Load equipment
@@ -54,8 +56,9 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             BossEquipmentItem boots = YamlUtils.loadBossEquipment(yaml, "equipment.boots");
             BossEquipmentItem[] equipment = new BossEquipmentItem[] { weapon, helmet, chestplate, leggings, boots };
 
-            PriorityQueue<BossPhase> phases = new PriorityQueue<>();
 
+            // Load phases
+            PriorityQueue<BossPhase> phases = new PriorityQueue<>();
             ConfigurationSection phasesSection = yaml.getSection("phases");
             for (String path : phasesSection.getKeys(false)) {
                 double minHealth = phasesSection.getDouble(path + ".min_health");
@@ -66,29 +69,9 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
 
             return new BossData(id, settings, spawnEgg, equipment, phases);
         } catch (Exception e) {
-            Bukkit.getLogger().severe("Failed to load boss: " + file.getName());
+            SakuraBossesPlugin.getPluginLogger().severe("Failed to load boss: " + file.getName());
             e.printStackTrace();
         }
         return null;
-    }
-
-    public BossEquipmentItem weapon() {
-        return this.equipment[0];
-    }
-
-    public BossEquipmentItem helmet() {
-        return this.equipment[1];
-    }
-
-    public BossEquipmentItem chestplate() {
-        return this.equipment[2];
-    }
-
-    public BossEquipmentItem leggings() {
-        return this.equipment[3];
-    }
-
-    public BossEquipmentItem boots() {
-        return this.equipment[4];
     }
 }

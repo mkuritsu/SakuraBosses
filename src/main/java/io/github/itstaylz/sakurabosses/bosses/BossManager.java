@@ -3,7 +3,6 @@ package io.github.itstaylz.sakurabosses.bosses;
 import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -14,10 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class BossManager {
 
@@ -27,6 +23,11 @@ public final class BossManager {
 
     public static final NamespacedKey BOSS_SPAWN_EGG_KEY;
 
+    public static final NamespacedKey BOSS_MINION_KEY;
+
+    public static final NamespacedKey MINION_DAMAGE_KEY;
+
+
     static {
         JavaPlugin plugin = JavaPlugin.getPlugin(SakuraBossesPlugin.class);
         BOSS_FOLDER = new File(plugin.getDataFolder(), "bosses");
@@ -34,6 +35,8 @@ public final class BossManager {
             BOSS_FOLDER.mkdirs();
         ENTITY_BOSS_KEY = new NamespacedKey(plugin, "entity_boss");
         BOSS_SPAWN_EGG_KEY = new NamespacedKey(plugin, "boss_spawn_egg");
+        BOSS_MINION_KEY = new NamespacedKey(plugin, "boss_minion");
+        MINION_DAMAGE_KEY = new NamespacedKey(plugin, "boss_minion_damage");
     }
 
     private static final HashMap<String, BossData> BOSS_REGISTRY = new HashMap<>();
@@ -51,6 +54,19 @@ public final class BossManager {
                     boss.updateTarget();
             }
         }.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    public static boolean isMinion(Entity entity) {
+        return EntityUtils.hasPDCValue(entity, BOSS_MINION_KEY, PersistentDataType.STRING);
+    }
+
+    public static EntityBoss getOwnedBoss(Entity entity) {
+        UUID uuid = UUID.fromString(EntityUtils.getPDCValue(entity, BOSS_MINION_KEY, PersistentDataType.STRING));
+        return ENTITY_BOSS_REGISTRY.get(uuid);
+    }
+
+    public static Set<String> getAllIds() {
+        return BOSS_REGISTRY.keySet();
     }
 
     public static void loadBosses() {

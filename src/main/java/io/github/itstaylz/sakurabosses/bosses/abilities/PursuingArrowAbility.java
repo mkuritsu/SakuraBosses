@@ -18,15 +18,17 @@ import java.util.List;
 
 public class PursuingArrowAbility extends TargetAbility<PursuingArrowAbility> {
 
-    private double damage, speed;
-    private int amount;
-    private Particle particle;
+    private final double damage, speed;
+    private final Particle particle;
 
-    PursuingArrowAbility(TargetType targetType, double damage, double speed, int amount, Particle particle) {
+    PursuingArrowAbility() {
+        this(TargetType.CLOSEST, 0, 0, Particle.FLAME);
+    }
+
+    PursuingArrowAbility(TargetType targetType, double damage, double speed, Particle particle) {
         super(targetType);
         this.damage = damage;
         this.speed = speed;
-        this.amount = amount;
         this.particle = particle;
     }
 
@@ -35,40 +37,28 @@ public class PursuingArrowAbility extends TargetAbility<PursuingArrowAbility> {
         TargetType targetType = loadTargetType(yaml, path);
         double damage = yaml.getConfig().getDouble(path + ".damage");
         double speed = yaml.getConfig().getDouble(path + ".speed");
-        int amount = yaml.getConfig().getInt(path + ".amount");
         String particleString = yaml.getConfig().getString(path + ".particle");
         Particle particle = particleString != null ? Particle.valueOf(particleString) : null;
-        return new PursuingArrowAbility(targetType, damage, speed, amount, particle);
+        return new PursuingArrowAbility(targetType, damage, speed, particle);
     }
 
     @Override
     public void activate(EntityBoss entityBoss, LivingEntity target) {
-        List<Arrow> arrows = new ArrayList<>();
-        for (int i = 0; i < this.amount; i++) {
-            Location location = entityBoss.getMobEntity().getLocation();
-            double xSpread = RandomUtils.RANDOM.nextDouble() * 2;
-            double zSpread = RandomUtils.RANDOM.nextDouble() * 2;
-            Arrow arrow = target.getWorld().spawnArrow(location.add(xSpread, 2, zSpread), new Vector(0, 0, 0), 0, 3);
-            arrow.setShooter(entityBoss.getMobEntity());
-            arrow.setDamage(this.damage);
-            arrows.add(arrow);
-        }
+        Location location = entityBoss.getMobEntity().getEyeLocation();
+        Arrow arrow = target.getWorld().spawnArrow(location, new Vector(0, 0, 0), 0, 3);
+        arrow.setShooter(entityBoss.getMobEntity());
+        arrow.setDamage(this.damage);
         new BukkitRunnable() {
             @Override
             public void run() {
-                boolean allDead = true;
-                for (Arrow arrow : arrows) {
-                    if (arrow.isOnGround() || arrow.isDead()) {
-                        continue;
-                    }
-                    if (particle != null)
-                        arrow.getWorld().spawnParticle(particle, arrow.getLocation(), 2, 0, 0, 0, 0.03);
-                    Vector direction = target.getEyeLocation().subtract(arrow.getLocation()).toVector();
-                    arrow.setVelocity(direction.multiply(speed));
-                    allDead = false;
-                }
-                if (allDead)
+                if (arrow.isOnGround() || arrow.isDead()) {
                     cancel();
+                    return;
+                }
+                if (particle != null)
+                    arrow.getWorld().spawnParticle(particle, arrow.getLocation(), 2, 0, 0, 0, 0.03);
+                Vector direction = target.getEyeLocation().subtract(arrow.getLocation()).toVector();
+                arrow.setVelocity(direction.multiply(speed));
             }
         }.runTaskTimer(JavaPlugin.getPlugin(SakuraBossesPlugin.class), 0L, 1L);
     }

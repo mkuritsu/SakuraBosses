@@ -14,3 +14,7 @@ commands:
   bossesreload:
     permission: sakurabosses.reload
     permission-message: §cNo permission
+
+  spawnboss:
+    permission: sakurabosses.spawnboss
+    permission-message: §cNo permission

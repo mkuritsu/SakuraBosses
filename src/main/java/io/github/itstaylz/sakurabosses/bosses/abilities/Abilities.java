@@ -12,35 +12,43 @@ import java.util.List;
 
 public final class Abilities {
 
-    public static final IBossAbility<ArrowRainAbility> ARROW_RAIN = new ArrowRainAbility(TargetType.CLOSEST, 0, 0, 0);
+    public static final IBossAbility<ArrowRainAbility> ARROW_RAIN = new ArrowRainAbility();
 
-    public static final IBossAbility<ThrowAbility> THROW_ABILITY = new ThrowAbility(TargetType.CLOSEST, new Vector(0, 0, 0));
+    public static final IBossAbility<ThrowAbility> THROW_ABILITY = new ThrowAbility();
 
-    public static final IBossAbility<MessageAbility> MESSAGE_ABILITY = new MessageAbility(TargetType.CLOSEST, null);
+    public static final IBossAbility<MessageAbility> MESSAGE_ABILITY = new MessageAbility();
 
-    public static final IBossAbility<FireballAbility> FIREBALL_ABILITY = new FireballAbility(TargetType.CLOSEST, 0, 0, 0);
+    public static final IBossAbility<FireballAbility> FIREBALL_ABILITY = new FireballAbility();
 
-    public static final IBossAbility<ExplosionAbility> EXPLOSION_ABILITY = new ExplosionAbility(TargetType.CLOSEST, 0);
+    public static final IBossAbility<ExplosionAbility> EXPLOSION_ABILITY = new ExplosionAbility();
 
-    public static final IBossAbility<CommandAbility> COMMAND_ABILITY = new CommandAbility(TargetType.CLOSEST, null);
+    public static final IBossAbility<CommandAbility> COMMAND_ABILITY = new CommandAbility();
 
-    public static final IBossAbility<PotionAbility> POTION_ABILITY = new PotionAbility(TargetType.CLOSEST, PotionType.AWKWARD, 0 ,0);
+    public static final IBossAbility<PotionAbility> POTION_ABILITY = new PotionAbility();
 
-    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW_ABILITY = new PursuingArrowAbility(TargetType.CLOSEST, 0, 0, 0, null);
+    public static final IBossAbility<PursuingArrowAbility> PURSUING_ARROW_ABILITY = new PursuingArrowAbility();
 
-    public static final IBossAbility<WebAbility> WEB_ABILITY = new WebAbility(TargetType.CLOSEST, 0, 0, 0, 0);
+    public static final IBossAbility<WebAbility> WEB_ABILITY = new WebAbility();
 
-    public static final IBossAbility<LifeStealAbility> LIFESTEAL = new LifeStealAbility(0, 0);
+    public static final IBossAbility<LifeStealAbility> LIFESTEAL = new LifeStealAbility();
 
-    public static final IBossAbility<KnockbackAbility> KNOCKBACK = new KnockbackAbility(TargetType.CLOSEST, 0, 0, 0);
+    public static final IBossAbility<SmiteAbility> SMITE = new SmiteAbility();
 
-    public static final IBossAbility<SmiteAbility> SMITE = new SmiteAbility(TargetType.CLOSEST, 0);
+    public static final IBossAbility<ImmunityAbility> IMMUNITY = new ImmunityAbility();
 
-    public static final IBossAbility<ImmunityAbility> IMMUNITY = new ImmunityAbility(null, 0);
+    public static final IBossAbility<TeleportAbility> TELEPORT = new TeleportAbility();
 
-    public static final IBossAbility<TeleportAbility> TELEPORT = new TeleportAbility(TargetType.CLOSEST);
+    public static final IBossAbility<DurabilityAbility> DURABILITY = new DurabilityAbility();
 
-    public static final IBossAbility<DurabilityAbility> DURABILITY = new DurabilityAbility(0, 0);
+    public static final IBossAbility<BombAbility> BOMB = new BombAbility();
+
+    public static final IBossAbility<MirrorAbility> MIRROR = new MirrorAbility();
+
+    public static final IBossAbility<ParticleAbility> PARTICLE = new ParticleAbility();
+
+    public static final IBossAbility<TreasureAbility> TREASURE = new TreasureAbility();
+
+    public static final IBossAbility<MinionsAbility> MINIONS = new MinionsAbility();
 
     private static final HashMap<String, IBossAbility<?>> ABILITY_REGISTRY = new HashMap<>();
 
@@ -55,11 +63,15 @@ public final class Abilities {
         ABILITY_REGISTRY.put("pursuing_arrow", PURSUING_ARROW_ABILITY);
         ABILITY_REGISTRY.put("web", WEB_ABILITY);
         ABILITY_REGISTRY.put("lifesteal", LIFESTEAL);
-        ABILITY_REGISTRY.put("knockback", KNOCKBACK);
         ABILITY_REGISTRY.put("smite", SMITE);
         ABILITY_REGISTRY.put("immunity", IMMUNITY);
         ABILITY_REGISTRY.put("teleport", TELEPORT);
         ABILITY_REGISTRY.put("durability", DURABILITY);
+        ABILITY_REGISTRY.put("bomb", BOMB);
+        ABILITY_REGISTRY.put("mirror", MIRROR);
+        ABILITY_REGISTRY.put("particle", PARTICLE);
+        ABILITY_REGISTRY.put("treasure", TREASURE);
+        ABILITY_REGISTRY.put("minions", MINIONS);
     }
 
     public static List<IBossAbility<?>> loadBossAbilities(YamlFile yaml, String path) {

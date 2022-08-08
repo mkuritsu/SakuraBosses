@@ -10,6 +10,10 @@ public class MessageAbility extends TargetAbility<MessageAbility> {
 
     private final String message;
 
+    MessageAbility() {
+        this(TargetType.CLOSEST, null);
+    }
+
     MessageAbility(TargetType targetType, String message) {
         super(targetType);
         this.message = message;

@@ -10,7 +10,11 @@ public class SmiteAbility extends TargetAbility<SmiteAbility> {
 
     private final double damage;
 
-    public SmiteAbility(TargetType targetType, double damage) {
+    SmiteAbility() {
+        this(TargetType.CLOSEST, 0);
+    }
+
+    SmiteAbility(TargetType targetType, double damage) {
         super(targetType);
         this.damage = damage;
     }

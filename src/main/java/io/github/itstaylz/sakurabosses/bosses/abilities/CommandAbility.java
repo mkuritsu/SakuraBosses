@@ -10,6 +10,11 @@ public class CommandAbility extends TargetAbility<CommandAbility> {
 
     private final String command;
 
+
+    CommandAbility() {
+        this(TargetType.CLOSEST, null);
+    }
+
     CommandAbility(TargetType targetType, String command) {
         super(targetType);
         this.command = command;

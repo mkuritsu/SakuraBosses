@@ -22,6 +22,6 @@ public class LifeStealEffect implements IBossEffect<BossDamagePlayerEvent> {
         double health = boss.getMobEntity().getHealth();
         double newHealth = Math.min(health + damage * this.multiplier, boss.getBossData().settings().maxHealth());
         boss.getMobEntity().setHealth(newHealth);
-        boss.updateHealthBar();
+        boss.updateHealth();
     }
 }

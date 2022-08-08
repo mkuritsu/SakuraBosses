@@ -1,24 +1,32 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
+import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
+import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class FireballAbility extends TargetAbility<FireballAbility> {
     private final int amount, delay;
-    private double speed;
+    private final double damage;
 
-    FireballAbility(TargetType targetType, int amount, int delay, double speed) {
+    FireballAbility() {
+        this(TargetType.CLOSEST, 0, 0, 0);
+    }
+
+    FireballAbility(TargetType targetType, int amount, int delay, double damage) {
         super(targetType);
         this.amount = amount;
         this.delay = delay;
-        this.speed = speed;
+        this.damage = damage;
     }
 
     @Override
@@ -26,8 +34,8 @@ public class FireballAbility extends TargetAbility<FireballAbility> {
         TargetType type = loadTargetType(yaml, path);
         int amount = yaml.getConfig().getInt(path + ".amount");
         int delay = yaml.getConfig().getInt(path + ".delay");
-        double speed = yaml.getConfig().getDouble(path + ".speed");
-        return new FireballAbility(type, amount, delay, speed);
+        double damage = yaml.getConfig().getDouble(path + ".damage");
+        return new FireballAbility(type, amount, delay, damage);
     }
 
     @Override
@@ -42,8 +50,11 @@ public class FireballAbility extends TargetAbility<FireballAbility> {
                     cancel();
                     return;
                 }
-                Vector direction = target.getLocation().subtract(entityBoss.getMobEntity().getLocation()).toVector().normalize();
-                entityBoss.getMobEntity().launchProjectile(Fireball.class, direction.multiply(speed));
+                Fireball fireball = (Fireball) entityBoss.spawnMinion(entityBoss.getMobEntity().getEyeLocation(), EntityType.FIREBALL);
+                Vector direction = target.getLocation().subtract(fireball.getLocation()).toVector().normalize();
+                fireball.setDirection(direction);
+                fireball.setShooter(entityBoss.getMobEntity());
+                EntityUtils.setPDCValue(fireball, BossManager.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE, damage);
                 counter++;
             }
         }.runTaskTimer(JavaPlugin.getPlugin(SakuraBossesPlugin.class), 0L, this.delay);

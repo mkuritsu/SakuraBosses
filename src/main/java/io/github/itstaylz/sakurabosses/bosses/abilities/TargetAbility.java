@@ -1,24 +1,16 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import com.earth2me.essentials.Essentials;
 import io.github.itstaylz.hexlib.storage.files.YamlFile;
 import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
 public abstract class TargetAbility<T extends IBossAbility<T>> implements IBossAbility<T> {
-
-    private static final Essentials ESSENTIALS;
-
-    static {
-        ESSENTIALS = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-    }
 
     private final TargetType targetType;
 
@@ -41,23 +33,23 @@ public abstract class TargetAbility<T extends IBossAbility<T>> implements IBossA
                 activate(entityBoss, target);
         } else {
             List<Player> players = entityBoss.getPlayersInRadius();
+            Bukkit.broadcastMessage("PLAYERS EMPTY: " + players.isEmpty());
             if (players.isEmpty())
                 return;
             if (targetType == TargetType.RANDOM) {
                 int index = RandomUtils.RANDOM.nextInt(0, players.size());
+                Bukkit.broadcastMessage("RANDOM: " + index);
                 activate(entityBoss, players.get(index));
             } else {
                 Player target = null;
+                Bukkit.broadcastMessage("CHECKING: CLOSET, HIGHEST_HEALTH, LOWEST_HEALTH");
                 for (Player player : players) {
-                    if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR ||
-                            ESSENTIALS.getUser(player).isVanished() || player.isDead())
-                        continue;
                     if (targetType == TargetType.ALL_PLAYERS) {
                         activate(entityBoss, player);
                     } else {
                         if (target == null)
                             target = player;
-                        if ((targetType == TargetType.CLOSEST &&
+                        else if ((targetType == TargetType.CLOSEST &&
                                 player.getLocation().distance(entityBoss.getMobEntity().getLocation()) < target.getLocation().distance(entityBoss.getMobEntity().getLocation())) ||
                                 (targetType == TargetType.HIGHEST_HEALTH && player.getHealth() > target.getHealth()) ||
                                 (targetType == TargetType.LOWEST_HEALTH && player.getHealth() < target.getHealth())) {

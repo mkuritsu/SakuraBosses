@@ -16,26 +16,28 @@ import java.util.List;
 
 public class WebAbility extends TargetAbility<WebAbility> {
 
-    private final int x, y, z, duration;
+    private final int width, height, duration;
 
     private final List<Block> tempBlocks = new ArrayList<>();
 
-    WebAbility(TargetType targetType, int x, int y, int z, int duration) {
+    WebAbility() {
+        this(TargetType.CLOSEST, 0, 0, 0);
+    }
+
+    WebAbility(TargetType targetType, int width, int height, int duration) {
         super(targetType);
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.width = width;
+        this.height = height;
         this.duration = duration;
     }
 
     @Override
     public WebAbility create(YamlFile yaml, String path) {
         TargetType targetType = loadTargetType(yaml, path);
-        int x = yaml.getConfig().getInt(path + ".x");
-        int y = yaml.getConfig().getInt(path + ".y");
-        int z = yaml.getConfig().getInt(path + ".z");
+        int width = yaml.getConfig().getInt(path + ".width");
+        int height = yaml.getConfig().getInt(path + ".height");
         int duration = yaml.getConfig().getInt(path + ".duration");
-        return new WebAbility(targetType, x, y, z, duration);
+        return new WebAbility(targetType, width, height, duration);
     }
 
     @Override
@@ -56,8 +58,8 @@ public class WebAbility extends TargetAbility<WebAbility> {
     private void fillEmptyBlocks(Location center) {
         if (center.getWorld() == null)
             return;
-        Location top = center.clone().add(this.x, this.y, this.z);
-        Location bot = center.clone().subtract(this.x, this.y, this.z);
+        Location top = center.clone().add(this.width, this.height, this.width);
+        Location bot = center.clone().subtract(this.width, this.height, this.width);
         int xIncrement = top.getBlockX() < bot.getBlockX() ? 1 : -1;
         int yIncrement = top.getBlockY() < bot.getBlockY() ? 1 : -1;
         int zIncrement = top.getBlockZ() < bot.getBlockZ() ? 1 : -1;
@@ -68,6 +70,7 @@ public class WebAbility extends TargetAbility<WebAbility> {
                     Block block = center.getWorld().getBlockAt(x, y, z);
                     if (block.getType() == Material.AIR) {
                         block.setType(Material.COBWEB);
+                        block.getDrops().clear();
                         tempBlocks.add(block);
                     }
                 }

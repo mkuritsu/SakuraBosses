@@ -12,6 +12,10 @@ public class PotionAbility extends TargetAbility<PotionAbility> {
     private final PotionType type;
     private final int duration, amplifier;
 
+    PotionAbility() {
+        this(TargetType.CLOSEST, PotionType.INVISIBILITY, 0, 0);
+    }
+
     PotionAbility(TargetType targetType, PotionType type, int duration, int amplifier) {
         super(targetType);
         this.type = type;
@@ -22,7 +26,7 @@ public class PotionAbility extends TargetAbility<PotionAbility> {
     @Override
     public PotionAbility create(YamlFile yaml, String path) {
         TargetType targetType = loadTargetType(yaml, path);
-        PotionType type = PotionType.valueOf(yaml.getOrDefault(path + ".potion", "POISON"));
+        PotionType type = PotionType.valueOf(yaml.getOrDefault(path + ".potion_type", "POISON"));
         int duration = yaml.getConfig().getInt(path + ".duration");
         int amplifier = yaml.getConfig().getInt(path + ".amplifier");
         return new PotionAbility(targetType, type, duration, amplifier);

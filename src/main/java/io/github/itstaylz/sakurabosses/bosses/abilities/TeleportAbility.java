@@ -8,6 +8,10 @@ import org.bukkit.entity.LivingEntity;
 
 public class TeleportAbility extends TargetAbility<TeleportAbility> {
 
+    TeleportAbility() {
+        this(TargetType.CLOSEST);
+    }
+
     TeleportAbility(TargetType targetType) {
         super(targetType);
     }

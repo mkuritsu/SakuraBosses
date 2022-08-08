@@ -19,11 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public record BossData(String id, BossSettings settings, BossSpawnEggSettings spawnEggSettings, BossEquipmentItem[] equipment, PriorityQueue<BossPhase> phases) {
+public record BossData(String id, BossSettings settings, ItemStack spawnEgg, BossEquipmentItem[] equipment, PriorityQueue<BossPhase> phases) {
 
     public static BossData loadFromFile(File file) {
         YamlFile yaml = new YamlFile(file);
@@ -40,12 +39,12 @@ public record BossData(String id, BossSettings settings, BossSpawnEggSettings sp
             BossSettings settings = new BossSettings(displayName, entityType, maxHealth, targetType, knockBack, radius);
 
             // Load spawn egg settings
-            Material spawnEggMaterial = Material.valueOf(yaml.getOrDefault("spawn_egg.material", "ZOMBIE_SPAWN_EGG"));
-            String spawnEggDisplayName = StringUtils.fullColorize(yaml.getOrDefault("spawn_egg.display_name", displayName));
-            List<String> spawnEggLore = yaml.getConfig().getStringList("spawn_egg.lore");
-            spawnEggLore.replaceAll(StringUtils::fullColorize);
+            ItemStack spawnEgg = YamlUtils.loadItemStack(yaml, "spawn_egg");
             boolean glowing = yaml.getConfig().getBoolean("spawn_egg.glowing");
-            BossSpawnEggSettings spawnEggSettings = new BossSpawnEggSettings(spawnEggMaterial, spawnEggDisplayName, spawnEggLore, glowing);
+            if (glowing)
+                new ItemBuilder(spawnEgg).addEnchant(Enchantment.DURABILITY, 1).addItemFlags(ItemFlag.HIDE_ENCHANTS).build();
+            ItemUtils.setPDCValue(spawnEgg, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
+
 
             // Load equipment
             BossEquipmentItem weapon = YamlUtils.loadBossEquipment(yaml, "equipment.weapon");
@@ -65,25 +64,12 @@ public record BossData(String id, BossSettings settings, BossSpawnEggSettings sp
                 phases.add(new BossPhase(minHealth, abilities));
             }
 
-            return new BossData(id, settings, spawnEggSettings, equipment, phases);
+            return new BossData(id, settings, spawnEgg, equipment, phases);
         } catch (Exception e) {
             Bukkit.getLogger().severe("Failed to load boss: " + file.getName());
-            Bukkit.getLogger().severe(e.getMessage());
+            e.printStackTrace();
         }
         return null;
-    }
-
-    public ItemStack spawnEgg() {
-        ItemBuilder builder = new ItemBuilder(spawnEggSettings.material())
-                .setDisplayName(spawnEggSettings.displayName())
-                .setLore(spawnEggSettings.lore());
-        if (this.spawnEggSettings.glowing()) {
-            builder.addEnchant(Enchantment.DURABILITY, 1);
-            builder.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        ItemStack spawnEgg = builder.build();
-        ItemUtils.setPDCValue(spawnEgg, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, this.id);
-        return spawnEgg;
     }
 
     public BossEquipmentItem weapon() {

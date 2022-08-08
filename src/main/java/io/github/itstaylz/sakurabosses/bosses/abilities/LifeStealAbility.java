@@ -6,10 +6,14 @@ import io.github.itstaylz.sakurabosses.bosses.effects.LifeStealEffect;
 
 public class LifeStealAbility implements IBossAbility<LifeStealAbility> {
 
-    private double multiplier;
-    private int duration;
+    private final double multiplier;
+    private final int duration;
 
-    public LifeStealAbility(double multiplier, int duration) {
+    LifeStealAbility() {
+        this(0, 0);
+    }
+
+    LifeStealAbility(double multiplier, int duration) {
         this.multiplier = multiplier;
         this.duration = duration;
     }

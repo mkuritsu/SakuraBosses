@@ -5,7 +5,11 @@ import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.events.BossDamagePlayerEvent;
 import io.github.itstaylz.sakurabosses.events.PlayerDamageBossEvent;
+import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,6 +18,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class BossListener implements Listener {
@@ -24,22 +29,9 @@ public class BossListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    private void onEntityDamage(EntityDamageEvent event) {
-        Entity entity = event.getEntity();
-        if (BossManager.isBoss(entity)) {
-            EntityBoss entityBoss = BossManager.getEntityBoss(entity.getUniqueId());
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    int multiplier = entityBoss.getBossData().settings().knockBack() ? 1 : 0;
-                    entity.setVelocity(entity.getVelocity().multiply(multiplier));
-                    entityBoss.updateHealthBar();
-                }
-            }.runTaskLater(this.plugin, 1L);
-        }
-    }
 
+    // Load bosses into memory on server startup
+    //-------------------------------------------------------------------------------------------------------
     @EventHandler
     private void onEntitiesLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
@@ -52,51 +44,129 @@ public class BossListener implements Listener {
         }
     }
 
-    @EventHandler
-    private void onDeath(EntityDeathEvent event) {
-        EntityBoss boss = BossManager.getEntityBoss(event.getEntity().getUniqueId());
-        if (boss != null) {
-            event.getDrops().clear();
-            event.setDroppedExp(0);
-            boss.onDeath();
+    // Update boss health bar and disable knockback if necessary
+    //-------------------------------------------------------------------------------------------------------
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onEntityDamage(EntityDamageEvent event) {
+        Entity entity = event.getEntity();
+        if (BossManager.isBoss(entity) || BossManager.isMinion(entity)) {
+            EntityBoss entityBoss = BossManager.getEntityBoss(entity.getUniqueId());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (entityBoss != null) {
+                        int multiplier = entityBoss.getBossData().settings().knockBack() ? 1 : 0;
+                        entity.setVelocity(entity.getVelocity().multiply(multiplier));
+                        entityBoss.updateHealth();
+                    } else if (entity instanceof LivingEntity livingEntity)
+                        HealthBarUtils.updateHealthBar(livingEntity);
+                }
+            }.runTaskLater(this.plugin, 1L);
         }
     }
 
+
+    // Disable block explosion for minions
+    //-------------------------------------------------------------------------------------------------------
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onExplode(EntityExplodeEvent event) {
+        Entity entity = event.getEntity();
+        if (BossManager.isMinion(entity)) {
+            event.setCancelled(true);
+            entity.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1);
+            entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+        }
+    }
+
+
+    // Disable projectile  hitting boss
+    //-------------------------------------------------------------------------------------------------------
+
     @EventHandler
     private void onHit(ProjectileHitEvent event) {
-        if (event.getHitEntity() != null && event.getEntityType() != EntityType.ARROW) {
-            EntityBoss boss = BossManager.getEntityBoss(event.getHitEntity().getUniqueId());
-            if (boss != null) {
-                if (event.getEntity().getShooter() != null && event.getEntity().getShooter() == event.getHitEntity())
-                    event.setCancelled(true);
+        Entity victim = event.getHitEntity();
+        ProjectileSource shooter = event.getEntity().getShooter();
+        if (victim != null && !(victim instanceof Player) && shooter instanceof Mob mob && BossManager.isBoss(mob)) {
+            event.setCancelled(true);
+        }
+    }
+
+
+    // Disables minions and boss drops and call boss death
+    //-------------------------------------------------------------------------------------------------------
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onDeath(EntityDeathEvent event) {
+        Entity entity = event.getEntity();
+        EntityBoss boss = BossManager.getEntityBoss(event.getEntity().getUniqueId());
+        if (BossManager.isMinion(entity) || boss != null) {
+            event.getDrops().clear();
+            event.setDroppedExp(0);
+        }
+        if (boss != null)
+            boss.onDeath();
+    }
+
+    // Apply minions explosion damage (used for BombAbility and FireballAbility to work properly)
+    @EventHandler
+    private void onDamageByEntity(EntityDamageByEntityEvent event) {
+        Entity victim = event.getEntity();
+        Entity damager = event.getDamager();
+        if (victim instanceof Player) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && BossManager.isMinion(damager)) {
+                Double minionDamage = EntityUtils.getPDCValue(damager, BossManager.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE);
+                double damage = 0;
+                if (minionDamage != null)
+                    damage = minionDamage;
+                event.setDamage(damage);
             }
         }
     }
 
-    @EventHandler
+
+    // Call custom events and disable minion damaging boss
+    //-------------------------------------------------------------------------------------------------------
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onDamage(EntityDamageByEntityEvent event) {
         Entity victim = event.getEntity();
         Entity damager = event.getDamager();
         EntityBoss victimBoss = BossManager.getEntityBoss(victim.getUniqueId());
         EntityBoss damagerBoss = BossManager.getEntityBoss(damager.getUniqueId());
-        if (victimBoss != null && damager instanceof Arrow arrow) {
-            if (arrow.getShooter() != null && arrow.getShooter().equals(victim)) {
+        if (victimBoss != null) {
+            if (BossManager.isMinion(damager))
                 event.setCancelled(true);
-            }
-        }
-        if (damagerBoss != null && event.getEntity() instanceof Player player)
+            else if (damager instanceof Player player)
+                Bukkit.getPluginManager().callEvent(new PlayerDamageBossEvent(event, player, victimBoss));
+        } else if (damagerBoss != null && event.getEntity() instanceof Player player)
             Bukkit.getPluginManager().callEvent(new BossDamagePlayerEvent(event, player, damagerBoss));
-        else if (victimBoss != null && damager instanceof Player player)
-            Bukkit.getPluginManager().callEvent(new PlayerDamageBossEvent(event, player, victimBoss));
     }
 
-    @EventHandler
+
+    // Custom events to trigger effects
+    //-------------------------------------------------------------------------------------------------------
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBossDamage(BossDamagePlayerEvent event) {
         event.getEntityBoss().triggerEffects(event);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onPlayerDamage(PlayerDamageBossEvent event) {
         event.getEntityBoss().triggerEffects(event);
+    }
+
+    // Disable entity functionality for boss and minions
+    //-------------------------------------------------------------------------------------------------------
+    @EventHandler
+    private void onItemPickup(EntityPickupItemEvent event) {
+        Entity entity = event.getEntity();
+        if (BossManager.isBoss(entity) || BossManager.isMinion(entity))
+            event.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onMobGrief(EntityChangeBlockEvent event) {
+        Entity entity = event.getEntity();
+        if (BossManager.isMinion(entity) || BossManager.isBoss(entity))
+            event.setCancelled(true);
     }
 }

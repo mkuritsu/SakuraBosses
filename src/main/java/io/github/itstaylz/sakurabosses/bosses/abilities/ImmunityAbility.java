@@ -11,7 +11,11 @@ public class ImmunityAbility implements IBossAbility<ImmunityAbility> {
     private final List<String> ignoreList;
     private final int duration;
 
-    public ImmunityAbility(List<String> materials, int duration) {
+    ImmunityAbility() {
+        this(null, 0);
+    }
+
+    ImmunityAbility(List<String> materials, int duration) {
         this.ignoreList = materials;
         this.duration = duration;
     }

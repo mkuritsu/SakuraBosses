@@ -3,7 +3,6 @@ package io.github.itstaylz.sakurabosses.bosses.effects;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.events.PlayerDamageBossEvent;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -23,7 +22,6 @@ public class ImmunityEffect implements IBossEffect<PlayerDamageBossEvent> {
 
     @Override
     public void activate(EntityBoss boss, PlayerDamageBossEvent event) {
-        EntityDamageByEntityEvent entityDamageEvent = event.getEntityDamageEvent();
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
         for (String ignore : this.ignoreList) {

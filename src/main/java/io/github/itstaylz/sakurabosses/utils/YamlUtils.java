@@ -16,7 +16,9 @@ import java.util.List;
 public final class YamlUtils {
 
     public static ItemStack loadItemStack(YamlFile yaml, String path) {
-        Material material = Material.valueOf(yaml.get(path + ".material", String.class));
+        if (!yaml.contains(path))
+            return null;
+        Material material = Material.valueOf(yaml.getOrDefault(path + ".material", "STONE"));
         ItemBuilder builder;
         if (material == Material.PLAYER_HEAD) {
             SkullBuilder skullBuilder = new SkullBuilder();
@@ -28,6 +30,14 @@ public final class YamlUtils {
         } else {
             builder = new ItemBuilder(material);
         }
+        int amount = yaml.getConfig().getInt(path + ".amount");
+        amount = Math.max(Math.min(amount, 64), 1);
+        builder.setAmount(amount);
+        if (yaml.contains(path + ".lore")) {
+            List<String> lore = yaml.getConfig().getStringList(path + ".lore");
+            lore.replaceAll(StringUtils::fullColorize);
+            builder.setLore(lore);
+        }
         if (yaml.contains(path + ".display_name"))
             builder.setDisplayName(StringUtils.fullColorize(yaml.get(path + ".display_name", String.class)));
         if (yaml.contains(path + ".enchants")) {
@@ -36,7 +46,6 @@ public final class YamlUtils {
                 String[] enchantStringSplitted = enchantString.split(":");
                 String enchantName = enchantStringSplitted[0];
                 int level = Integer.parseInt(enchantStringSplitted[1]);
-
                 try {
                     Field enchantField = Enchantment.class.getDeclaredField(enchantName);
                     Enchantment enchant = (Enchantment) enchantField.get(null);

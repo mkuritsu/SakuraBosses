@@ -8,11 +8,15 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.RegisteredListener;
 
 public class PlayerListener implements Listener {
 
@@ -20,7 +24,7 @@ public class PlayerListener implements Listener {
     private void onSpawn(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
-        if (item != null && block != null && item.getType().name().contains("SPAWN_EGG") &&
+        if (item != null && block != null && item.getType().name().contains("SPAWN_EGG") && event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 ItemUtils.hasPDCValue(item, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING)) {
             event.setCancelled(true);
             String bossId = ItemUtils.getPDCValue(item, BossManager.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING);

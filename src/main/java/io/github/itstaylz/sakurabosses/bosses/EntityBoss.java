@@ -5,14 +5,20 @@ import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
+import io.github.itstaylz.sakurabosses.bosses.data.BossEquipmentItem;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
 import io.github.itstaylz.sakurabosses.bosses.effects.IBossEffect;
+import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
+import io.github.itstaylz.sakurabosses.utils.MobEntityUtils;
+import io.github.itstaylz.sakurabosses.utils.TargetUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -40,12 +46,7 @@ public class EntityBoss {
         reloadData(bossData);
     }
 
-    public void activateEffect(IBossEffect<?> effect) {
-        activateEffect(effect, -1);
-    }
-
     public void activateEffect(IBossEffect<?> effect, int duration) {
-        Bukkit.broadcastMessage("Activating effect: " + effect.getClass().getName() + " for: " + duration + " ticks!");
         activeEffects.add(effect);
         if (duration > 0) {
             new BukkitRunnable() {
@@ -58,7 +59,6 @@ public class EntityBoss {
     }
 
     public void deactivateEffect(IBossEffect<?> effect) {
-        Bukkit.broadcastMessage("Deactivating effect: " + effect.getClass().getName());
         activeEffects.remove(effect);
     }
 
@@ -77,29 +77,21 @@ public class EntityBoss {
         while (!this.phases.isEmpty() && this.phases.peek().minHealth() > this.bossData.settings().maxHealth())
             this.phases.poll();
         if (this.mobEntity != null) {
-            this.mobEntity.setHealth(this.bossData.settings().maxHealth());
-            updateHealthBar();
+            this.mobEntity.setCustomNameVisible(true);
+            this.mobEntity.setCustomName(this.bossData.settings().displayName());
+            MobEntityUtils.setEquipment(this.mobEntity, this.bossData.equipment());
+            MobEntityUtils.setMaxHealth(this.mobEntity, this.bossData.settings().maxHealth());
+            updateHealth();
         }
     }
 
     public void spawn(Location location) {
         this.mobEntity = (Mob) location.getWorld().spawnEntity(location, this.bossData.settings().entityType());
-        AttributeInstance healthAttribute = this.mobEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        healthAttribute.setBaseValue(bossData.settings().maxHealth());
-        this.mobEntity.getEquipment().setItemInMainHand(this.bossData.weapon().itemStack());
-        this.mobEntity.getEquipment().setHelmet(this.bossData.helmet().itemStack());
-        this.mobEntity.getEquipment().setChestplate(this.bossData.chestplate().itemStack());
-        this.mobEntity.getEquipment().setLeggings(this.bossData.leggings().itemStack());
-        this.mobEntity.getEquipment().setBoots(this.bossData.boots().itemStack());
-        this.mobEntity.setCustomNameVisible(true);
-        this.mobEntity.setHealth(healthAttribute.getValue());
-        EntityUtils.setPDCValue(this.mobEntity, BossManager.ENTITY_BOSS_KEY, PersistentDataType.STRING, this.bossData.id());
-        updateHealthBar();
+        reloadData(this.bossData);
     }
 
-    public void updateHealthBar() {
-        String health = String.format("%.1f", this.mobEntity.getHealth());
-        this.mobEntity.setCustomName(StringUtils.colorize(this.bossData.settings().displayName() + " &7| &c" + health + " &4♥"));
+    public void updateHealth() {
+        HealthBarUtils.updateHealthBar(this.mobEntity);
         if (!this.phases.isEmpty()) {
             BossPhase nextPhase = this.phases.peek();
             if (this.mobEntity.getHealth() <= nextPhase.minHealth()) {
@@ -111,21 +103,31 @@ public class EntityBoss {
     }
 
     public List<Player> getPlayersInRadius() {
+        return getPlayersInRadius(this.bossData.settings().radius());
+    }
+
+    public List<Player> getPlayersInRadius(double radius) {
         List<Player> players = new ArrayList<>();
-        for (Entity entity : this.mobEntity.getNearbyEntities(bossData.settings().radius(), bossData.settings().radius(), bossData.settings().radius())) {
-            if (entity instanceof Player player && player.getGameMode() != GameMode.CREATIVE
-                    && player.getGameMode() != GameMode.SURVIVAL && !SakuraBossesPlugin.essentials.getUser(player).isVanished()
-                    && !player.isDead())
+        for (Entity entity : this.mobEntity.getNearbyEntities(radius, radius, radius)) {
+            if (entity instanceof Player player && TargetUtils.canBeTarget(player))
                 players.add(player);
         }
         return players;
     }
 
     public void onDeath() {
-        if (RandomUtils.isChanceSuccessful(this.bossData.weapon().dropChance())) {
-            this.mobEntity.getWorld().dropItemNaturally(this.mobEntity.getLocation(), this.bossData.weapon().itemStack());
-            BossManager.removeEntityBoss(getUniqueId());
+        for (BossEquipmentItem equipment : this.bossData.equipment()) {
+            if (equipment.itemStack().getType() != Material.AIR && RandomUtils.isChanceSuccessful(equipment.dropChance())) {
+                this.mobEntity.getWorld().dropItemNaturally(this.mobEntity.getLocation(), equipment.itemStack());
+            }
         }
+        BossManager.removeEntityBoss(getUniqueId());
+    }
+
+    public Entity spawnMinion(Location location, EntityType type) {
+        Entity entity = location.getWorld().spawnEntity(location, type);
+        EntityUtils.setPDCValue(entity, BossManager.BOSS_MINION_KEY, PersistentDataType.STRING, this.mobEntity.getUniqueId().toString());
+        return entity;
     }
 
     public void updateTarget() {
@@ -135,9 +137,7 @@ public class EntityBoss {
         double targetDistance = 0;
         List<Player> nearbyPlayers = new ArrayList<>();
         for (Entity entity : this.mobEntity.getNearbyEntities(radius, radius, radius)) {
-            if (entity instanceof Player player && player.getGameMode() != GameMode.CREATIVE
-                    && player.getGameMode() != GameMode.SPECTATOR && !SakuraBossesPlugin.essentials.getUser(player).isVanished()
-                    && !player.isDead()) {
+            if (entity instanceof Player player && TargetUtils.canBeTarget(player)) {
 
                 if (target == null) {
                     target = player;
@@ -162,7 +162,6 @@ public class EntityBoss {
         if (targetType == TargetType.RANDOM && !nearbyPlayers.isEmpty())
             target = nearbyPlayers.get(RandomUtils.RANDOM.nextInt(0, nearbyPlayers.size()));
         this.mobEntity.setTarget(target);
-        //Bukkit.broadcastMessage(StringUtils.colorize("DEBUG > Target updated for " + this.mobEntity.getName() + "&r ->> " + target));
     }
 
     public UUID getUniqueId() {

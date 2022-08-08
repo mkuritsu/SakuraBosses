@@ -8,6 +8,10 @@ public class DurabilityAbility implements IBossAbility<DurabilityAbility> {
 
     private final int damage, duration;
 
+    DurabilityAbility() {
+        this(0, 0);
+    }
+
     public DurabilityAbility(int damage, int duration) {
         this.damage = damage;
         this.duration = duration;

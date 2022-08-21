@@ -26,7 +26,7 @@ public class PotionAbility extends ATargetAbility<PotionAbility> {
     @Override
     public PotionAbility create(YamlFile yaml, String path) {
         TargetType targetType = loadTargetType(yaml, path);
-        PotionType type = PotionType.valueOf(yaml.getOrDefault(path + ".potion_type", "POISON"));
+        PotionType type = PotionType.valueOf(yaml.getConfig().getString(path + ".potion_type"));
         int duration = yaml.getConfig().getInt(path + ".duration");
         int amplifier = yaml.getConfig().getInt(path + ".amplifier");
         return new PotionAbility(targetType, type, duration, amplifier);

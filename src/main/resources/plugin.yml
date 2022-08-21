@@ -18,3 +18,16 @@ commands:
   spawnboss:
     permission: sakurabosses.spawnboss
     permission-message: §cNo permission
+
+  setbosswarp:
+    permission: sakurabosses.managewarps
+    permission-message: §cNo permission
+
+  deletebosswarp:
+    aliases: [delbosswarp]
+    permission: sakurabosses.managewarps
+    permission-message: §cNo permission
+
+
+  bosswarps:
+

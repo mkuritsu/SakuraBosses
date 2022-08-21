@@ -3,6 +3,7 @@ package io.github.itstaylz.sakurabosses.bosses;
 import io.github.itstaylz.hexlib.utils.EntityUtils;
 import io.github.itstaylz.hexlib.utils.RandomUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
+import io.github.itstaylz.sakurabosses.bosses.abilities.RandomAbility;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
 import io.github.itstaylz.sakurabosses.bosses.data.BossEquipmentItem;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
@@ -10,6 +11,7 @@ import io.github.itstaylz.sakurabosses.bosses.effects.IBossEffect;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
 import io.github.itstaylz.sakurabosses.utils.MobEntityUtils;
 import io.github.itstaylz.sakurabosses.utils.TargetUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -19,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -31,13 +34,16 @@ public class EntityBoss {
 
     private final HashMap<Class<? extends IBossEffect>, IBossEffect> activeEffects = new HashMap<>();
 
+    private BukkitTask task;
+
     public EntityBoss(BossData bossData) {
         this(bossData, null);
     }
 
     public EntityBoss(BossData bossData, Mob entity) {
         this.mobEntity = entity;
-        reloadData(bossData);
+        this.bossData = bossData;
+        //reloadData(bossData);
     }
 
     public void activateEffect(IBossEffect effect, int duration) {
@@ -77,6 +83,9 @@ public class EntityBoss {
             MobEntityUtils.setEquipment(this.mobEntity, this.bossData.equipment());
             MobEntityUtils.setMaxHealth(this.mobEntity, this.bossData.settings().maxHealth());
             updateHealth();
+            if (this.task != null && !this.task.isCancelled())
+                this.task.cancel();
+            startAbilityTask();
         }
     }
 
@@ -157,6 +166,29 @@ public class EntityBoss {
         if (targetType == TargetType.RANDOM && !nearbyPlayers.isEmpty())
             target = nearbyPlayers.get(RandomUtils.RANDOM.nextInt(0, nearbyPlayers.size()));
         this.mobEntity.setTarget(target);
+    }
+
+    public void startAbilityTask() {
+        if (this.bossData.settings().abilityTimer() <= 0 || this.bossData.abilities().isEmpty())
+            return;
+        EntityBoss boss = this;
+        this.task = new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                if (mobEntity.isDead()) {
+                    task = null;
+                    cancel();
+                    return;
+                }
+                for (RandomAbility ability : bossData.abilities()) {
+                    if (RandomUtils.isChanceSuccessful(ability.activationChance())) {
+                        ability.activate(boss);
+                        break;
+                    }
+                }
+            }
+        }.runTaskTimer(JavaPlugin.getProvidingPlugin(SakuraBossesPlugin.class), 20L, this.bossData.settings().abilityTimer());
     }
 
     public UUID getUniqueId() {

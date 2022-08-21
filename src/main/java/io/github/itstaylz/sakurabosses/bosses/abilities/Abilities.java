@@ -71,17 +71,23 @@ public final class Abilities {
         ABILITY_REGISTRY.put("minions", MINIONS);
     }
 
+    public static IBossAbility<?> loadAbility(YamlFile yaml, String path) {
+        String type = yaml.getConfig().getString(path + ".type");
+        if (type != null && ABILITY_REGISTRY.containsKey(type)) {
+            return ABILITY_REGISTRY.get(type).create(yaml, path);
+        }
+        return null;
+    }
+
     public static List<IBossAbility<?>> loadBossAbilities(YamlFile yaml, String path) {
         List<IBossAbility<?>> abilities = new ArrayList<>();
         ConfigurationSection section = yaml.getSection(path);
         if (section != null) {
             for (String key : section.getKeys(false)) {
                 String keyPath = path + "." + key;
-                String type = yaml.getConfig().getString(keyPath + ".type");
-                if (type != null && ABILITY_REGISTRY.containsKey(type)) {
-                    IBossAbility<?> ability = ABILITY_REGISTRY.get(type);
-                    abilities.add(ability.create(yaml, keyPath));
-                }
+                IBossAbility<?> ability = loadAbility(yaml, keyPath);
+                if (ability != null)
+                    abilities.add(ability);
             }
         }
         return abilities;

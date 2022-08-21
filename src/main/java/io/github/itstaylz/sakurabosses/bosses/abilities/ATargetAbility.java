@@ -33,16 +33,13 @@ public abstract class ATargetAbility<T extends IBossAbility<T>> implements IBoss
                 activate(entityBoss, target);
         } else {
             List<Player> players = entityBoss.getPlayersInRadius();
-            Bukkit.broadcastMessage("PLAYERS EMPTY: " + players.isEmpty());
             if (players.isEmpty())
                 return;
             if (targetType == TargetType.RANDOM) {
                 int index = RandomUtils.RANDOM.nextInt(0, players.size());
-                Bukkit.broadcastMessage("RANDOM: " + index);
                 activate(entityBoss, players.get(index));
             } else {
                 Player target = null;
-                Bukkit.broadcastMessage("CHECKING: CLOSET, HIGHEST_HEALTH, LOWEST_HEALTH");
                 for (Player player : players) {
                     if (targetType == TargetType.ALL_PLAYERS) {
                         activate(entityBoss, player);

@@ -9,6 +9,7 @@ import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossPhase;
 import io.github.itstaylz.sakurabosses.bosses.abilities.Abilities;
 import io.github.itstaylz.sakurabosses.bosses.abilities.IBossAbility;
+import io.github.itstaylz.sakurabosses.bosses.abilities.RandomAbility;
 import io.github.itstaylz.sakurabosses.utils.YamlUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -18,10 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public record BossData(String id, BossSettings settings, ItemStack spawnEgg, BossEquipmentItem[] equipment, PriorityQueue<BossPhase> phases) {
+public record BossData(String id, BossSettings settings, ItemStack spawnEgg, BossEquipmentItem[] equipment, PriorityQueue<BossPhase> phases, List<RandomAbility> abilities) {
 
     public static BossData loadFromFile(File file) {
         YamlFile yaml = new YamlFile(file);
@@ -35,7 +37,9 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             TargetType targetType = TargetType.valueOf(yaml.getOrDefault("settings.target_type", "CLOSEST"));
             boolean knockBack = yaml.getConfig().getBoolean("settings.knockback");
             double radius = yaml.getConfig().getDouble("settings.radius");
-            BossSettings settings = new BossSettings(displayName, entityType, maxHealth, targetType, knockBack, radius);
+            int abilityTimer = yaml.getConfig().getInt("settings.ability_timer");
+            String spawnMessage = yaml.getConfig().getString("settings.spawn_message");
+            BossSettings settings = new BossSettings(displayName, entityType, maxHealth, targetType, knockBack, radius, abilityTimer, spawnMessage);
 
             // Load spawn egg
             ItemStack spawnEgg = YamlUtils.loadItemStack(yaml, "spawn_egg");
@@ -52,6 +56,19 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             BossEquipmentItem boots = YamlUtils.loadBossEquipment(yaml, "equipment.boots");
             BossEquipmentItem[] equipment = new BossEquipmentItem[] { weapon, helmet, chestplate, leggings, boots };
 
+            // Load abilities
+            List<RandomAbility> randomAbilities = new ArrayList<>();
+            ConfigurationSection abilitiesSection = yaml.getSection("abilities");
+            if (abilitiesSection != null) {
+                for (String key : abilitiesSection.getKeys(false)) {
+                    String path = "abilities." + key;
+                    IBossAbility<?> ability = Abilities.loadAbility(yaml, path);
+                    double activationChance = yaml.getConfig().getDouble(path + ".activation_chance");
+                    List<IBossAbility<?>> childAbilities = Abilities.loadBossAbilities(yaml, path + ".children");
+                    randomAbilities.add(new RandomAbility(ability, childAbilities, activationChance));
+                }
+            }
+
             // Load phases
             PriorityQueue<BossPhase> phases = new PriorityQueue<>();
             ConfigurationSection phasesSection = yaml.getSection("phases");
@@ -62,7 +79,7 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
                 phases.add(new BossPhase(minHealth, abilities));
             }
 
-            return new BossData(id, settings, spawnEgg, equipment, phases);
+            return new BossData(id, settings, spawnEgg, equipment, phases, randomAbilities);
         } catch (Exception e) {
             SakuraBossesPlugin.getPluginLogger().severe("Failed to load boss: " + file.getName());
             e.printStackTrace();

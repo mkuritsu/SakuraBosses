@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
-import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
@@ -31,7 +31,7 @@ public class BossListener implements Listener {
     private void onEntitiesLoad(EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             if (entity instanceof Mob mob) {
-                String bossId = EntityUtils.getPDCValue(entity, BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING);
+                String bossId = PDCUtils.getPDCValue(entity, BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING);
                 if (bossId != null) {
                     BossManager.loadEntityBoss(mob, bossId);
                 }

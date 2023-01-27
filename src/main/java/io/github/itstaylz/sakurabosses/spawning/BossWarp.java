@@ -1,7 +1,7 @@
 package io.github.itstaylz.sakurabosses.spawning;
 
 import io.github.itstaylz.hexlib.items.ItemBuilder;
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
@@ -47,7 +47,7 @@ public class BossWarp {
         YamlFile yaml = new YamlFile(file);
         try {
             String id = file.getName().replace(".yml", "");
-            String displayName = yaml.contains("display_name") ? StringUtils.fullColorize(yaml.getConfig().getString("display_name")) : id;
+            String displayName = yaml.contains("display_name") ? StringUtils.colorize(yaml.getConfig().getString("display_name")) : id;
             String worldName = yaml.getConfig().getString("location.world");
             World world = Bukkit.getWorld(worldName);
             if (world == null)

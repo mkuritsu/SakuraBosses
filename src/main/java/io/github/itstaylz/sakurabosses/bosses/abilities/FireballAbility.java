@@ -1,7 +1,7 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
@@ -54,7 +54,7 @@ public class FireballAbility extends ATargetAbility<FireballAbility> {
                 Vector direction = target.getLocation().subtract(fireball.getLocation()).toVector().normalize();
                 fireball.setDirection(direction);
                 fireball.setShooter(entityBoss.getMobEntity());
-                EntityUtils.setPDCValue(fireball, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE, damage);
+                PDCUtils.setPDCValue(fireball, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE, damage);
                 counter++;
             }
         }.runTaskTimer(JavaPlugin.getPlugin(SakuraBossesPlugin.class), 0L, this.delay);

@@ -1,8 +1,8 @@
 package io.github.itstaylz.sakurabosses.bosses.data;
 
 import io.github.itstaylz.hexlib.items.ItemBuilder;
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.hexlib.utils.ItemUtils;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
@@ -31,7 +31,7 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             String id = file.getName().replace(".yml", "");
 
             // Load general boss settings
-            String displayName = StringUtils.fullColorize(yaml.getOrDefault("settings.display_name", "&4&lBOSS"));
+            String displayName = StringUtils.colorize(yaml.getOrDefault("settings.display_name", "&4&lBOSS"));
             EntityType entityType = EntityType.valueOf(yaml.getOrDefault("settings.entity_type", "ZOMBIE"));
             double maxHealth = yaml.contains("settings.max_health") ? yaml.getConfig().getDouble("settings.max_health") : 10000;
             TargetType targetType = TargetType.valueOf(yaml.getOrDefault("settings.target_type", "CLOSEST"));
@@ -45,8 +45,8 @@ public record BossData(String id, BossSettings settings, ItemStack spawnEgg, Bos
             ItemStack spawnEgg = YamlUtils.loadItemStack(yaml, "spawn_egg");
             boolean glowing = yaml.getConfig().getBoolean("spawn_egg.glowing");
             if (glowing)
-                new ItemBuilder(spawnEgg).addEnchant(Enchantment.DURABILITY, 1).addItemFlags(ItemFlag.HIDE_ENCHANTS).build();
-            ItemUtils.setPDCValue(spawnEgg, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
+                new ItemBuilder(spawnEgg).addEnchantment(Enchantment.DURABILITY, 1).addItemFlags(ItemFlag.HIDE_ENCHANTS).build();
+            PDCUtils.setPDCValue(spawnEgg, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING, id);
 
             // Load equipment
             BossEquipmentItem weapon = YamlUtils.loadBossEquipment(yaml, "equipment.weapon");

@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.utils.YamlUtils;
 import org.bukkit.configuration.ConfigurationSection;

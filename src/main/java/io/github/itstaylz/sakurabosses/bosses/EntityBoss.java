@@ -1,7 +1,7 @@
 package io.github.itstaylz.sakurabosses.bosses;
 
-import io.github.itstaylz.hexlib.utils.EntityUtils;
-import io.github.itstaylz.hexlib.utils.RandomUtils;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
+import io.github.itstaylz.hexlib.utils.RandomGenerator;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.abilities.RandomAbility;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
@@ -11,7 +11,6 @@ import io.github.itstaylz.sakurabosses.bosses.effects.IBossEffect;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
 import io.github.itstaylz.sakurabosses.utils.MobEntityUtils;
 import io.github.itstaylz.sakurabosses.utils.TargetUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -26,6 +25,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
 public class EntityBoss {
+
+    private static final RandomGenerator RANDOM_GENERATOR = new RandomGenerator();
 
     private Mob mobEntity;
     private BossData bossData;
@@ -121,7 +122,7 @@ public class EntityBoss {
 
     public void onDeath() {
         for (BossEquipmentItem equipment : this.bossData.equipment()) {
-            if (equipment.itemStack().getType() != Material.AIR && RandomUtils.isChanceSuccessful(equipment.dropChance())) {
+            if (equipment.itemStack().getType() != Material.AIR && RANDOM_GENERATOR.isChanceSuccessful(equipment.dropChance())) {
                 this.mobEntity.getWorld().dropItemNaturally(this.mobEntity.getLocation(), equipment.itemStack());
             }
         }
@@ -130,7 +131,7 @@ public class EntityBoss {
 
     public Entity spawnMinion(Location location, EntityType type) {
         Entity entity = location.getWorld().spawnEntity(location, type);
-        EntityUtils.setPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING, this.mobEntity.getUniqueId().toString());
+        PDCUtils.setPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING, this.mobEntity.getUniqueId().toString());
         return entity;
     }
 
@@ -164,7 +165,7 @@ public class EntityBoss {
             }
         }
         if (targetType == TargetType.RANDOM && !nearbyPlayers.isEmpty())
-            target = nearbyPlayers.get(RandomUtils.RANDOM.nextInt(0, nearbyPlayers.size()));
+            target = nearbyPlayers.get(RANDOM_GENERATOR.getRandom().nextInt(0, nearbyPlayers.size()));
         this.mobEntity.setTarget(target);
     }
 
@@ -182,7 +183,7 @@ public class EntityBoss {
                     return;
                 }
                 for (RandomAbility ability : bossData.abilities()) {
-                    if (RandomUtils.isChanceSuccessful(ability.activationChance())) {
+                    if (RANDOM_GENERATOR.isChanceSuccessful(ability.activationChance())) {
                         ability.activate(boss);
                         break;
                     }

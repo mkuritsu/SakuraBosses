@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
-import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import org.bukkit.Particle;
@@ -35,7 +35,7 @@ public class AbilityListener implements Listener {
         Entity damager = event.getDamager();
         if (victim instanceof Player) {
             if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && BossManager.isMinion(damager)) {
-                Double minionDamage = EntityUtils.getPDCValue(damager, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE);
+                Double minionDamage = PDCUtils.getPDCValue(damager, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE);
                 double damage = 0;
                 if (minionDamage != null)
                     damage = minionDamage;

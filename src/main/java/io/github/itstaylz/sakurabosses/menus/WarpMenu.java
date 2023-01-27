@@ -1,8 +1,9 @@
 package io.github.itstaylz.sakurabosses.menus;
 
 import io.github.itstaylz.hexlib.items.ItemBuilder;
-import io.github.itstaylz.hexlib.menus.Menu;
-import io.github.itstaylz.hexlib.menus.components.MenuButton;
+import io.github.itstaylz.hexlib.menu.Menu;
+import io.github.itstaylz.hexlib.menu.MenuSettings;
+import io.github.itstaylz.hexlib.menu.components.Button;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.spawning.BossWarp;
 import io.github.itstaylz.sakurabosses.spawning.WarpManager;
@@ -13,6 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class WarpMenu extends Menu {
+
+    private static final MenuSettings SETTINGS = MenuSettings.builder()
+            .withNumberOfRows(5)
+            .withTitle(StringUtils.colorize("&9&lWarps"))
+            .build();
 
     private static final ItemStack BACK_ARROW = new ItemBuilder(Material.ARROW)
             .setDisplayName(StringUtils.colorize("&ePrevious Page"))
@@ -27,7 +33,7 @@ public class WarpMenu extends Menu {
     private final int amountOfPages;
 
     public WarpMenu() {
-        super(5*9, StringUtils.colorize("&9&lWarps"), false, true, null);
+        super(SETTINGS);
         this.warps = WarpManager.getAllWarps();
         this.amountOfPages = (int) Math.ceil(this.warps.size() / 21.0);
         openPage(0);
@@ -40,7 +46,7 @@ public class WarpMenu extends Menu {
             if (i == 17 || i == 18 || i == 26 || i == 27)
                 continue;
             BossWarp warp = this.warps.get(index);
-            addComponent(i, new MenuButton(warp.getMenuItem(), ((event, player, menu) -> {
+            setComponent(i, new Button(warp.getMenuItem(), ((menu, player, event) -> {
                 if (player.hasPermission("sakurabosses.managewarps")) {
                     menu.close(player);
                     player.teleport(warp.getLocation());
@@ -50,11 +56,11 @@ public class WarpMenu extends Menu {
             index++;
         }
         if (page > 0)
-            addComponent(18, new MenuButton(BACK_ARROW, (event, player, menu) -> {
+            setComponent(18, new Button(BACK_ARROW, (menu, player, event) -> {
                 openPage(page - 1);
             }));
         if (page + 1 < this.amountOfPages)
-            addComponent(26, new MenuButton(NEXT_ARROW, (event, player, menu) -> {
+            setComponent(26, new Button(NEXT_ARROW, (menu, player, event) -> {
                 openPage(page + 1);
             }));
     }

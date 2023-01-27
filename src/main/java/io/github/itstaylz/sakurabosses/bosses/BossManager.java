@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.bosses;
 
-import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.SakuraBossesPlugin;
 import io.github.itstaylz.sakurabosses.bosses.data.BossData;
 import org.bukkit.Location;
@@ -67,11 +67,11 @@ public final class BossManager {
     }
 
     public static boolean isMinion(Entity entity) {
-        return EntityUtils.hasPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING);
+        return PDCUtils.hasPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING);
     }
 
     public static EntityBoss getOwnedBoss(Entity entity) {
-        UUID uuid = UUID.fromString(EntityUtils.getPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING));
+        UUID uuid = UUID.fromString(PDCUtils.getPDCValue(entity, BossDataKeys.BOSS_MINION_KEY, PersistentDataType.STRING));
         return ENTITY_BOSS_REGISTRY.get(uuid);
     }
 

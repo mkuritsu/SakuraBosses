@@ -1,10 +1,9 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.hexlib.utils.RandomUtils;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
+import io.github.itstaylz.hexlib.utils.RandomGenerator;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -13,6 +12,7 @@ import java.util.List;
 public abstract class ATargetAbility<T extends IBossAbility<T>> implements IBossAbility<T> {
 
     private final TargetType targetType;
+    private static final RandomGenerator RANDOM_GENERATOR = new RandomGenerator();
 
     ATargetAbility(TargetType targetType) {
         this.targetType = targetType;
@@ -36,7 +36,7 @@ public abstract class ATargetAbility<T extends IBossAbility<T>> implements IBoss
             if (players.isEmpty())
                 return;
             if (targetType == TargetType.RANDOM) {
-                int index = RandomUtils.RANDOM.nextInt(0, players.size());
+                int index = RANDOM_GENERATOR.getRandom().nextInt(0, players.size());
                 activate(entityBoss, players.get(index));
             } else {
                 Player target = null;

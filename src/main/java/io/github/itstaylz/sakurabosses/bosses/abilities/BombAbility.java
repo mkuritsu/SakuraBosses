@@ -1,7 +1,7 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
-import io.github.itstaylz.hexlib.utils.EntityUtils;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.bosses.data.TargetType;
@@ -39,7 +39,7 @@ public class BombAbility extends ATargetAbility<BombAbility> {
     public void activate(EntityBoss entityBoss, LivingEntity target) {
         for (int i = 0; i < this.amount; i++) {
             Entity entity = entityBoss.spawnMinion(target.getLocation().clone().add(0, this.height, 0), EntityType.PRIMED_TNT);
-            EntityUtils.setPDCValue(entity, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE, this.damage);
+            PDCUtils.setPDCValue(entity, BossDataKeys.MINION_DAMAGE_KEY, PersistentDataType.DOUBLE, this.damage);
         }
     }
 }

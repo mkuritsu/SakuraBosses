@@ -18,7 +18,7 @@ public final class HealthBarUtils {
             }
             String displayName = sb.toString();
             String formattedHealth = String.format("%.1f", entity.getHealth());
-            entity.setCustomName(StringUtils.fullColorize(displayName + HEALTH_DIVIDER + " &c" + formattedHealth + " &4♥"));
+            entity.setCustomName(StringUtils.colorize(displayName + HEALTH_DIVIDER + " &c" + formattedHealth + " &4♥"));
         }
     }
 }

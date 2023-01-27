@@ -2,7 +2,7 @@ package io.github.itstaylz.sakurabosses.utils;
 
 import io.github.itstaylz.hexlib.items.ItemBuilder;
 import io.github.itstaylz.hexlib.items.SkullBuilder;
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.bosses.data.BossEquipmentItem;
 import org.bukkit.Bukkit;
@@ -35,11 +35,11 @@ public final class YamlUtils {
         builder.setAmount(amount);
         if (yaml.contains(path + ".lore")) {
             List<String> lore = yaml.getConfig().getStringList(path + ".lore");
-            lore.replaceAll(StringUtils::fullColorize);
+            lore.replaceAll(StringUtils::colorize);
             builder.setLore(lore);
         }
         if (yaml.contains(path + ".display_name"))
-            builder.setDisplayName(StringUtils.fullColorize(yaml.get(path + ".display_name", String.class)));
+            builder.setDisplayName(StringUtils.colorize(yaml.get(path + ".display_name", String.class)));
         if (yaml.contains(path + ".enchants")) {
             List<String> enchants = yaml.getConfig().getStringList(path + ".enchants");
             for (String enchantString : enchants) {
@@ -49,7 +49,7 @@ public final class YamlUtils {
                 try {
                     Field enchantField = Enchantment.class.getDeclaredField(enchantName);
                     Enchantment enchant = (Enchantment) enchantField.get(null);
-                    builder.addEnchant(enchant, level);
+                    builder.addEnchantment(enchant, level);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     Bukkit.getLogger().severe("INVALID ENCHANT NAME!: " + enchantName);
                 }

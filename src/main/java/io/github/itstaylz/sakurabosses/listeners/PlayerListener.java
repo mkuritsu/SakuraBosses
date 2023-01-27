@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.listeners;
 
-import io.github.itstaylz.hexlib.utils.ItemUtils;
+import io.github.itstaylz.hexlib.utils.PDCUtils;
 import io.github.itstaylz.sakurabosses.bosses.BossDataKeys;
 import io.github.itstaylz.sakurabosses.bosses.BossManager;
 import io.github.itstaylz.sakurabosses.bosses.BossTargeting;
@@ -23,9 +23,9 @@ public class PlayerListener implements Listener {
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
         if (item != null && block != null && item.getType().name().contains("SPAWN_EGG") && event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                ItemUtils.hasPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING)) {
+                PDCUtils.hasPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING)) {
             event.setCancelled(true);
-            String bossId = ItemUtils.getPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING);
+            String bossId = PDCUtils.getPDCValue(item, BossDataKeys.BOSS_SPAWN_EGG_KEY, PersistentDataType.STRING);
             Location spawnLocation = block.getLocation().add(event.getBlockFace().getDirection());
             BossManager.spawnBoss(bossId, spawnLocation);
             if (event.getPlayer().getGameMode() != GameMode.CREATIVE)

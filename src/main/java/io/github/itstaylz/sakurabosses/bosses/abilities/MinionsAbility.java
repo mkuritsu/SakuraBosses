@@ -1,6 +1,6 @@
 package io.github.itstaylz.sakurabosses.bosses.abilities;
 
-import io.github.itstaylz.hexlib.storage.files.YamlFile;
+import io.github.itstaylz.hexlib.storage.file.YamlFile;
 import io.github.itstaylz.hexlib.utils.StringUtils;
 import io.github.itstaylz.sakurabosses.bosses.EntityBoss;
 import io.github.itstaylz.sakurabosses.utils.HealthBarUtils;
@@ -39,7 +39,7 @@ public class MinionsAbility implements IBossAbility<MinionsAbility> {
         EntityType entityType = EntityType.valueOf(yaml.getConfig().getString(path + ".entity_type").toUpperCase());
         double maxHealth = yaml.getConfig().getDouble(path + ".max_health");
         int amount = yaml.getConfig().getInt(path + ".amount");
-        String displayName = StringUtils.fullColorize(yaml.getConfig().getString(path + ".display_name"));
+        String displayName = StringUtils.colorize(yaml.getConfig().getString(path + ".display_name"));
         ItemStack[] equipment = new ItemStack[5];
         equipment[0] = YamlUtils.loadItemStack(yaml, path + ".equipment.weapon");
         equipment[1] = YamlUtils.loadItemStack(yaml, path + ".equipment.helmet");

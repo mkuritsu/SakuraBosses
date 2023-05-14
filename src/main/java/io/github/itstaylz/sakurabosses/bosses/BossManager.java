@@ -38,7 +38,7 @@ public final class BossManager {
         EntityBoss entityBoss = new EntityBoss(data);
         entityBoss.spawn(location);
         ENTITY_BOSS_REGISTRY.put(entityBoss.getUniqueId(), entityBoss);
-        EntityUtils.setPDCValue(entityBoss.getMobEntity(), BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING, entityBoss.getBossData().id());
+        PDCUtils.setPDCValue(entityBoss.getMobEntity(), BossDataKeys.ENTITY_BOSS_KEY, PersistentDataType.STRING, entityBoss.getBossData().id());
     }
 
     public static void loadBosses() {
